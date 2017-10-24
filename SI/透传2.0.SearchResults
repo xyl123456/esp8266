@@ -1,0 +1,21 @@
+---- espconn_sent 匹配 (3 in 0 文件) ----
+User_main.c (app\user):    espconn_sent(&PhoneConn, uart_buf, len);
+User_main.c (app\user):	if(espconn_sent(pTcpClient, uart_buf, len) != ESPCONN_OK) 
+User_main.c (app\user):		if(espconn_sent(pTcpClient, trans_buf, trans_buf_count) != ESPCONN_OK) 
+---- TRANS_RECV_DATA_FROM_UART 匹配 (3 in 0 文件) ----
+User_main.c (app\user):		system_os_post(TRANS_TASK_PROI, (ETSSignal)TRANS_RECV_DATA_FROM_UART, trans_pending_count);		
+User_main.c (app\user):		case TRANS_RECV_DATA_FROM_UART: 
+User_main.c (app\user):			uart0_tx_SendStr("\r\nTRANS_RECV_DATA_FROM_UART:");
+---- TRANS_RECV_DATA_FROM_UART 匹配 (3 in 0 文件) ----
+User_main.c (app\user):		system_os_post(TRANS_TASK_PROI, (ETSSignal)TRANS_RECV_DATA_FROM_UART, trans_pending_count);		
+User_main.c (app\user):		case TRANS_RECV_DATA_FROM_UART: 
+User_main.c (app\user):			uart0_tx_SendStr("\r\nTRANS_RECV_DATA_FROM_UART:");
+---- trans_pending_count 匹配 (8 in 0 文件) ----
+User_main.c (app\user):static uint8 trans_pending_count = 0;
+User_main.c (app\user):	if(trans_pending_count){		
+User_main.c (app\user):		uart0_tx_SendStr("\r\nI am in trans_tcpclient_write_cb->trans_pending_count");
+User_main.c (app\user):		system_os_post(TRANS_TASK_PROI, (ETSSignal)TRANS_RECV_DATA_FROM_UART, trans_pending_count);		
+User_main.c (app\user):		trans_pending_count = 0;	
+User_main.c (app\user):			trans_pending_count = 0;		
+User_main.c (app\user):				trans_pending_count += data_len;			
+User_main.c (app\user):				trans_pending_count += data_len - trans_buf_free;			
