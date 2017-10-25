@@ -10,6 +10,8 @@
 
 
 extern void connect_to_server_init(uint8 buf[],int port);
+extern void connect_to_server_dns_init(void);
 struct espconn *temp_user_tcp_conn;
 
+#define DNS_ENABLE
 #endif /* APP_INCLUDE_TCP_CONN_H_ */

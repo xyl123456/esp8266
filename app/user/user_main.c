@@ -13,6 +13,7 @@
 #include "state_config.h"
 #include "tcp_conn.h"
 
+
 static struct espconn *pTcpClient;
 extern uint8 set_server_ip[6];
 
@@ -39,16 +40,21 @@ void ICACHE_FLASH_ATTR tcp_start_conn(void){
 	wifi_get_ip_info(STATION_IF, &ipconfig);
 
 	os_timer_disarm(&tcp_conn_timer);
-	esp8266_server_port=set_server_ip[4]*256 + set_server_ip[5];
-
 	uint8 ap_state = wifi_station_get_connect_status();//获取接口AP的状态
+
+	esp8266_server_port=set_server_ip[4]*256 + set_server_ip[5];
 	os_memcpy(esp8266_server_ip,set_server_ip,4);
 
 	if((ap_state==STATION_GOT_IP) && (ipconfig.ip.addr != 0))
 	{
+#ifdef DNS_ENABLE
+		connect_to_server_dns_init();
+#else
 	   connect_to_server_init(esp8266_server_ip,esp8266_server_port);
+#endif
 	}else
 	{
+
 		os_timer_setfn(&tcp_conn_timer, (os_timer_func_t *)tcp_start_conn, NULL);
 		os_timer_arm(&tcp_conn_timer, 10000, 0);
 	}
