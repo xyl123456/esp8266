@@ -17,4 +17,4 @@
  ../../include/ip_addr.h ../../include/queue.h ../../include/spi_flash.h \
  ../../include/spi_flash.h ../../include/espconn.h \
  ../../include/smartconfig.h ../../include/mem.h ../../include/gpio.h \
- ../include/tcp_conn.h
+ ../include/tcp_conn.h ../include/state_config.h

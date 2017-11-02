@@ -13,7 +13,6 @@
 #include "state_config.h"
 #include "tcp_conn.h"
 
-
 static struct espconn *pTcpClient;
 extern uint8 set_server_ip[6];
 
@@ -29,6 +28,7 @@ get_trans_conn(void){
 	return pTcpClient;
 }
 void user_rf_pre_init(void){
+
 }
 
 void ICACHE_FLASH_ATTR tcp_start_conn(void){
@@ -38,7 +38,7 @@ void ICACHE_FLASH_ATTR tcp_start_conn(void){
 	uint8 esp8266_server_ip[4];
 	int i;
 	wifi_get_ip_info(STATION_IF, &ipconfig);
-
+	spi_flash_read(0x3C * 4096, (uint32 *)set_server_ip, 6);  //读取server IP port
 	os_timer_disarm(&tcp_conn_timer);
 	uint8 ap_state = wifi_station_get_connect_status();//获取接口AP的状态
 
@@ -54,7 +54,6 @@ void ICACHE_FLASH_ATTR tcp_start_conn(void){
 #endif
 	}else
 	{
-
 		os_timer_setfn(&tcp_conn_timer, (os_timer_func_t *)tcp_start_conn, NULL);
 		os_timer_arm(&tcp_conn_timer, 10000, 0);
 	}
@@ -93,6 +92,7 @@ void user_init(void)
 	wifi_set_opmode(STATION_MODE);//设置工作模式为 station 模式
 
 	wifi_station_set_auto_connect(1);//设置上电自动连接已经记录的AP信息
+
 	wifi_station_set_reconnect_policy(true);//AP断开重连
 
 	system_init_done_cb(to_scan);

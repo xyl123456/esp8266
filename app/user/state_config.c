@@ -21,7 +21,7 @@
 
 extern uint8 set_server_ip[6];
 
-#define configtime 				30   //30*2
+#define configtime 				60   //30*2
 //配置状态
 #define NO_CONFIG 				0
 #define IN_CONFIG 				1
@@ -35,9 +35,10 @@ uint8 config_time;   //配置时间
 int8_t ipconfig_cnt=0;
 int8_t portconfig_cnt=0;
 
+
 struct espconn phone_udp_conn;
 esp_udp phone_udp;
-
+void ICACHE_FLASH_ATTR udp_process_command(char *pdata, unsigned short len);
 
 int udp_Current_Remote_Port;//UDP连接的远程端口
 uint8_t udp_Current_Remote_Ip[4] = {0};  //用来存放现在连接过来的远端IP
@@ -207,22 +208,26 @@ void ICACHE_FLASH_ATTR state_check(void){
 	  		  if(esp8266_state!=3){
 	  			esp8266_state=3;
 	  		  }
+	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFI模块未配置
 	  		esp8266_state=3;
 	  		config_state = NO_CONFIG;
 	  		  break;
 	  	  case STATION_CONNECT_FAIL:
 	  		  if(esp8266_state!=4){
-	  			uart0_tx_SendStr("connect again!\r\n");
 	  			esp8266_state=4;
 	  		  }
+		  	GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFI模块未配置
 	  		esp8266_state=4;
 	  		  break;
 	  	  case STATION_GOT_IP:
+	  	  {
 	  		  if(esp8266_state!=5){
 	  			udpdata_connect();
 	  			esp8266_state=5;
 	  		  }
+	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFI模块未配置
 	  		esp8266_state=5;
+	  	  }
 	  		  break;
 	  	  default:
 	  		  break;

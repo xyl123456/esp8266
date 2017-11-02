@@ -14,33 +14,38 @@
 #include "user_config.h"
 #include "smartconfig.h"
 #include "mem.h"
-#include "user_interface.h"
 #include "gpio.h"
 #include "tcp_conn.h"
+#include "state_config.h"
 
 #define NET_DOMAIN "api.env365.cn"
 #define DNS_PORT   1883
+
+
+struct espconn *temp_user_tcp_conn;
 
 struct espconn esp8266_tcp_conn;
 struct _esp_tcp user_tcp;
 os_timer_t tcp_reconn_timer;
 ip_addr_t tcp_server_dns_ip;
 void user_dns_found(const char *name,ip_addr_t *ipaddr,void *arg);
-//struct espconn *temp_user_tcp_conn;//用于存储连接设备FD，串口透传用
 
 void ICACHE_FLASH_ATTR
+esp8266_socket_send(uint8 buf[],uint8 len){
+    espconn_sent(temp_user_tcp_conn, buf, len);
+}
+void ICACHE_FLASH_ATTR
 esp8266_reconn_cb(void){
-
 	uint8_t reconn_server_ip[6];
 	uint8_t esp8266_reconn_ip[4];
 	uint16 esp8266_reconn_port;
 	os_timer_disarm(&tcp_reconn_timer);
-	//get ip info of ESP8266 station
-	//wifi_get_ip_info(STATION_IF, &ipconfig);
+
 	uint8_t wifi_reconn_state;
 	wifi_reconn_state=wifi_station_get_connect_status();
     if (wifi_reconn_state== STATION_GOT_IP)
 	{
+    	uart0_sendStr("connect to tcp server\r\n");
     	GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFI模块配置
     	spi_flash_read(0x3C * 4096, (uint32 *)reconn_server_ip, 6);
     	os_memcpy(esp8266_reconn_ip,reconn_server_ip,4);
@@ -51,7 +56,7 @@ esp8266_reconn_cb(void){
     }
 	else
 	{
-		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFI模块未配置
+		uart0_sendStr("reconnect to tcp server\r\n");
 		os_timer_setfn(&tcp_reconn_timer, (os_timer_func_t *)esp8266_reconn_cb, NULL);
 		os_timer_arm(&tcp_reconn_timer, 10000, 0);
 

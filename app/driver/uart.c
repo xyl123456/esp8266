@@ -30,11 +30,11 @@
 
 // UartDev is defined and initialized in rom code.
 extern UartDevice    UartDev;
-extern struct espconn *temp_user_tcp_conn;
-
 
 LOCAL struct UartBuffer* pTxBuffer = NULL;
 LOCAL struct UartBuffer* pRxBuffer = NULL;
+
+
 
 /*uart demo with a system task, to output what uart receives*/
 /*this is a example to process uart data from task,please change the priority to fit your application task if exists*/
@@ -349,6 +349,8 @@ rx_buff_get_data_len(void){
 LOCAL void ICACHE_FLASH_ATTR ///////
 uart_recvTask(os_event_t *events)
 {
+    uint8 data_buff[128];
+    uint8 seril_len;
     if(events->sig == 0){
     #if  UART_BUFF_EN  
         Uart_rx_buff_enq();
@@ -356,10 +358,14 @@ uart_recvTask(os_event_t *events)
         uint8 fifo_len = (READ_PERI_REG(UART_STATUS(UART0))>>UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT;
         uint8 d_tmp = 0;
         uint8 idx=0;
+        seril_len=fifo_len;
         for(idx=0;idx<fifo_len;idx++) {
             d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
-            uart_tx_one_char(UART0, d_tmp);
+           // uart_tx_one_char(UART0, d_tmp);
+            data_buff[idx]= d_tmp;
         }
+        esp8266_socket_send(data_buff,seril_len);
+        os_memset(data_buff,0,128);
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);
         uart_rx_intr_enable(UART0);
     #endif
@@ -367,6 +373,8 @@ uart_recvTask(os_event_t *events)
     #if UART_BUFF_EN
 	 //already move uart buffer output to uart empty interrupt
         //tx_start_uart_buffer(UART0);
+
+
     #else 
     
     #endif
@@ -569,23 +577,30 @@ void Uart_rx_buff_enq()
     uint8 fifo_len,buf_idx;
     uint8 fifo_data;
     uint8 data_buff[64];
+    uint8 seril_len;
+
     #if 1
     fifo_len = (READ_PERI_REG(UART_STATUS(UART0))>>UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT;
     if(fifo_len >= pRxBuffer->Space){
         os_printf("buf full!!!\n\r");            
     }else{
         buf_idx=0;
+        seril_len=fifo_len;
         while(buf_idx < fifo_len){
             fifo_data = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
             data_buff[buf_idx]=fifo_data;
             buf_idx++;
+            /*
             *(pRxBuffer->pInPos++) = fifo_data;
             if(pRxBuffer->pInPos == (pRxBuffer->pUartBuff + pRxBuffer->UartBuffSize)){
                 pRxBuffer->pInPos = pRxBuffer->pUartBuff;
+                */
             }
         }
-       // uart0_tx_buffer(data_buff,fifo_len);
-        espconn_sent(temp_user_tcp_conn, data_buff, fifo_len);
+        //uart0_tx_buffer(data_buff,fifo_len);
+        esp8266_socket_send(data_buff,seril_len);
+        os_memset(data_buff,0,64);
+        seril_len=0;
         pRxBuffer->Space -= fifo_len ;
         if(pRxBuffer->Space >= UART_FIFO_LEN){
             //os_printf("after rx enq buf enough\n\r");
