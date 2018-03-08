@@ -18,6 +18,7 @@
 #include "osapi.h"
 #include "driver/uart.h"
 #include "osapi.h"
+#include "spi_flash.h"
 #include "driver/gpio16.h"
 #include "driver/uart_register.h"
 #include "mem.h"
@@ -27,13 +28,12 @@
 
 #include "tcp_conn.h"
 #include "espconn.h"
+#include "state_config.h"
 
 // UartDev is defined and initialized in rom code.
 extern UartDevice    UartDev;
-
 LOCAL struct UartBuffer* pTxBuffer = NULL;
 LOCAL struct UartBuffer* pRxBuffer = NULL;
-
 
 
 /*uart demo with a system task, to output what uart receives*/
@@ -850,7 +850,6 @@ UART_SetPrintPort(uint8 uart_no)
 
 
 //========================================================
-
 
 /*test code*/
 void ICACHE_FLASH_ATTR

@@ -12,8 +12,9 @@
  /opt/xtensa-lx106-elf/lib/gcc/xtensa-lx106-elf/4.8.2/include/stddef.h \
  ../include/user_config.h ../include/driver/uart.h \
  ../include/driver/uart_register.h ../../include/eagle_soc.h \
- ../../include/c_types.h ../include/driver/gpio16.h ../../include/mem.h \
- ../../include/os_type.h ../../include/ets_sys.h \
- ../../include/user_interface.h ../../include/os_type.h \
- ../../include/ip_addr.h ../../include/queue.h ../../include/spi_flash.h \
- ../include/tcp_conn.h ../../include/espconn.h
+ ../../include/c_types.h ../../include/spi_flash.h \
+ ../include/driver/gpio16.h ../../include/mem.h ../../include/os_type.h \
+ ../../include/ets_sys.h ../../include/user_interface.h \
+ ../../include/os_type.h ../../include/ip_addr.h ../../include/queue.h \
+ ../../include/spi_flash.h ../include/tcp_conn.h ../../include/espconn.h \
+ ../include/state_config.h

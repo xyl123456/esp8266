@@ -18,9 +18,27 @@
 #include "tcp_conn.h"
 #include "state_config.h"
 
-#define NET_DOMAIN "api.env365.cn"
-#define DNS_PORT   1883
+//监测仪6000
+//四面出风7000
+//净化器7001
+//空调7002
+//地暖7003
 
+#define NET_DOMAIN "ibms.env365.cn"
+
+//#define NET_DOMAIN "api.env365.cn"
+//#define NET_DOMAIN "xylvip.top"
+#define DNS_PORT   6000
+
+
+uint8 head_line[2]={0xEB,0x90};
+uint8 tcp_init_length[2]={0x00,0x14};
+uint8 soft_dev[3]={0x20,0x00,0x00};
+uint8 hard_dev[3]={0x10,0x00,0x00};
+uint8 heat_time[3]={0x00,0x00,0x1E};
+uint8 tail_data[2]={0x0D,0x0A};
+
+TCP_INIT_DATA  tcp_init_data;
 
 struct espconn *temp_user_tcp_conn;
 
@@ -28,12 +46,31 @@ struct espconn esp8266_tcp_conn;
 struct _esp_tcp user_tcp;
 os_timer_t tcp_reconn_timer;
 ip_addr_t tcp_server_dns_ip;
-void user_dns_found(const char *name,ip_addr_t *ipaddr,void *arg);
+
+uint16_t ICACHE_FLASH_ATTR
+SumCheck(unsigned char *pData, unsigned char pLength){
+	uint16_t result = 0;
+	unsigned char i = 0;
+	for(i = 0; i < pLength; i++)
+	{
+		result = result + pData[i];
+	}
+
+	return result;
+
+}
 
 void ICACHE_FLASH_ATTR
 esp8266_socket_send(uint8 buf[],uint8 len){
-    espconn_sent(temp_user_tcp_conn, buf, len);
+		if(buf[4]==0x02){
+		    os_memcpy(dev_id,buf+5,4);
+		    spi_flash_erase_sector(0x3D);
+		    spi_flash_write(0x3D * 4096, (uint32 *)dev_id, 4);
+		    }else{
+		    espconn_sent(temp_user_tcp_conn, buf, len);
+			}
 }
+
 void ICACHE_FLASH_ATTR
 esp8266_reconn_cb(void){
 	uint8_t reconn_server_ip[6];
@@ -41,11 +78,14 @@ esp8266_reconn_cb(void){
 	uint16 esp8266_reconn_port;
 	os_timer_disarm(&tcp_reconn_timer);
 
+	struct ip_info ipconfig;
+	wifi_get_ip_info(STATION_IF, &ipconfig);
+
 	uint8_t wifi_reconn_state;
 	wifi_reconn_state=wifi_station_get_connect_status();
     if (wifi_reconn_state== STATION_GOT_IP)
 	{
-    	uart0_sendStr("connect to tcp server\r\n");
+    	//uart0_sendStr("connect to tcp server\r\n");
     	GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFI模块配置
     	spi_flash_read(0x3C * 4096, (uint32 *)reconn_server_ip, 6);
     	os_memcpy(esp8266_reconn_ip,reconn_server_ip,4);
@@ -56,7 +96,7 @@ esp8266_reconn_cb(void){
     }
 	else
 	{
-		uart0_sendStr("reconnect to tcp server\r\n");
+		//uart0_sendStr("reconnect to tcp server\r\n");
 		os_timer_setfn(&tcp_reconn_timer, (os_timer_func_t *)esp8266_reconn_cb, NULL);
 		os_timer_arm(&tcp_reconn_timer, 10000, 0);
 
@@ -64,8 +104,11 @@ esp8266_reconn_cb(void){
 }
 void ICACHE_FLASH_ATTR
 esp8266_reconn_dns_cb(void){
-
+	struct station_config *re_dsn;
 	os_timer_disarm(&tcp_reconn_timer);
+	struct ip_info ipconfig;
+	wifi_get_ip_info(STATION_IF, &ipconfig);
+
 	uint8_t wifi_reconn_state;
 		wifi_reconn_state=wifi_station_get_connect_status();
 	    if (wifi_reconn_state== STATION_GOT_IP)
@@ -77,12 +120,13 @@ esp8266_reconn_dns_cb(void){
 	    	tcp_server_dns_ip.addr = 0;
 	    	espconn_gethostbyname(&esp8266_tcp_conn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
 		}else{
+			//uart0_sendStr("reconnect to tcp server\r\n");
 			os_timer_setfn(&tcp_reconn_timer, (os_timer_func_t *)esp8266_reconn_dns_cb, NULL);
 			os_timer_arm(&tcp_reconn_timer, 10000, 0);
 		}
 }
 //TCP 重新连接
-LOCAL void ICACHE_FLASH_ATTR
+void ICACHE_FLASH_ATTR
 esp8266_tcp_recon_cb(void *arg, sint8 err){
 
 	os_timer_disarm(&tcp_reconn_timer);
@@ -99,7 +143,7 @@ esp8266_tcp_recon_cb(void *arg, sint8 err){
  * Parameters   : arg -- Additional argument to pass to the callback function
  * Returns      : none
 *******************************************************************************/
-LOCAL void ICACHE_FLASH_ATTR
+void ICACHE_FLASH_ATTR
 esp8266_tcp_discon_cb(void *arg){
 
 	os_timer_disarm(&tcp_reconn_timer);
@@ -111,28 +155,54 @@ esp8266_tcp_discon_cb(void *arg){
 	os_timer_arm(&tcp_reconn_timer, 10000, 0);
 }
 
-LOCAL void ICACHE_FLASH_ATTR
+void ICACHE_FLASH_ATTR
 esp8266_tcp_sent_cb(void *arg){
    //data sent successfully
 
 }
+void ICACHE_FLASH_ATTR
+process_command(char *pusrdata, unsigned short length)
+{
 
-LOCAL void ICACHE_FLASH_ATTR
+}
+void ICACHE_FLASH_ATTR
 esp8266_tcp_recv_cb(void *arg, char *pusrdata, unsigned short length){
 
 	uart0_tx_buffer(pusrdata,  length);
-	//process_command(pusrdata, length);
+	process_command(pusrdata, length);
 }
 
+void ICACHE_FLASH_ATTR
+espconn_init_sent(struct espconn *espconn)
+{
+	uint16_t sum_data;
+	uint8 buf[2];
+	spi_flash_read(0x3D * 4096, (uint32 *)dev_id, 4);  //读取server IP port
 
-LOCAL void ICACHE_FLASH_ATTR
+	os_memcpy(tcp_init_data.data_core.head,head_line,2);
+	os_memcpy(tcp_init_data.data_core.length,tcp_init_length,2);
+	tcp_init_data.data_core.data_type=0x02;
+	os_memcpy(tcp_init_data.data_core.dev_id,dev_id,4);
+	os_memcpy(tcp_init_data.data_core.sof_dev,soft_dev,3);
+	os_memcpy(tcp_init_data.data_core.hard_dev,hard_dev,3);
+	os_memcpy(tcp_init_data.data_core.heat_time,heat_time,3);
+	//tcp_init_data.data_core.rssi=wifi_rssi;
+
+	sum_data=SumCheck(tcp_init_data.data_buf+2,16);
+	buf[0]=(sum_data>>8)&0xFF;
+	buf[1]=sum_data&0xFF;
+	os_memcpy(tcp_init_data.data_core.crc_data,buf,2);
+	os_memcpy(tcp_init_data.data_core.tail_data,tail_data,2);
+	espconn_sent(espconn,tcp_init_data.data_buf,22);
+}
+void ICACHE_FLASH_ATTR
 esp8266_tcp_connect_cb(void *arg){
 
     struct espconn *pespconn = arg;
     espconn_regist_recvcb(pespconn, esp8266_tcp_recv_cb);
     espconn_regist_sentcb(pespconn, esp8266_tcp_sent_cb);
     espconn_regist_disconcb(pespconn, esp8266_tcp_discon_cb);
-
+    espconn_init_sent(pespconn);//tcp_init
 	temp_user_tcp_conn = arg;
 
 }

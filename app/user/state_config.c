@@ -17,9 +17,12 @@
 #include "mem.h"
 #include "gpio.h"
 #include "string.h"
+#include "tcp_conn.h"
 
 
 extern uint8 set_server_ip[6];
+
+uint8 wifi_rssi;
 
 #define configtime 				60   //30*2
 //配置状态
@@ -139,7 +142,7 @@ smartconfig_done(sc_status status, void *pdata){
         }
             break;
         case SC_STATUS_LINK_OVER:
-            uart0_sendStr("SC_STATUS_LINK_OVER\n");
+            //uart0_sendStr("SC_STATUS_LINK_OVER\n");
             if (pdata != NULL)
             {
                 uint8 phone_ip[4] = {0};
@@ -183,6 +186,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 		  		  break;
 		  	  case COMPLETE_CONFIG://以配置过，直接结束判断
 		  		config_state=COMPLETE_CONFIG;
+
 		  		  break;
 		  	  default:
 		  		  break;
@@ -222,10 +226,14 @@ void ICACHE_FLASH_ATTR state_check(void){
 	  	  case STATION_GOT_IP:
 	  	  {
 	  		  if(esp8266_state!=5){
-	  			udpdata_connect();
+				#ifdef DNS_ENABLE
+				#else
+		  			udpdata_connect();
+				#endif
 	  			esp8266_state=5;
 	  		  }
-	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFI模块未配置
+	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFI模块获取到IP并且连接成功
+	  		wifi_rssi=(wifi_station_get_rssi())&0x7F;
 	  		esp8266_state=5;
 	  	  }
 	  		  break;

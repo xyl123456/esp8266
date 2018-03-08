@@ -7,7 +7,6 @@
 #include "espconn.h"
 #include "user_config.h"
 #include "smartconfig.h"
-#include "user_interface.h"
 #include "gpio.h"
 #include "mem.h"
 #include "state_config.h"
@@ -88,6 +87,7 @@ void user_init(void)
 	uart_init(BIT_RATE_9600, BIT_RATE_9600);
 
 	spi_flash_read(0x3C * 4096, (uint32 *)set_server_ip, 6);  //读取server IP port
+	spi_flash_read(0x3D * 4096, (uint32 *)dev_id, 4);  //读取server IP port
 
 	wifi_set_opmode(STATION_MODE);//设置工作模式为 station 模式
 
