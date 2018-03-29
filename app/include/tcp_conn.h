@@ -19,7 +19,7 @@ extern void tcp_delete_conn(void);
 
 uint16_t SumCheck(unsigned char *pData, unsigned char pLength);
 void espconn_init_sent(struct espconn *espconn);
-#define DNS_ENABLE  1
+//#define DNS_ENABLE  1
 
 //#define DEBUG_MODE  1
 

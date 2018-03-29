@@ -45,10 +45,13 @@ void ICACHE_FLASH_ATTR tcp_start_conn(void){
 #ifdef DNS_ENABLE
 
 #else
-	spi_flash_read(0x3C * 4096, (uint32 *)set_server_ip, 6); //读取server IP port
+	spi_flash_read(0x3C*4096, (uint32 *)set_server_ip, 6); //读取server IP port
+
 	esp8266_server_port=set_server_ip[4]*256 + set_server_ip[5];
+
 	os_memcpy(esp8266_server_ip,set_server_ip,4);
 #endif
+
 
 	os_timer_disarm(&tcp_conn_timer);
 	uint8 ap_state = wifi_station_get_connect_status();//获取接口AP的状态

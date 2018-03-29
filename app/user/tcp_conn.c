@@ -28,8 +28,10 @@
 //ÃÀÀöÂèÂè  1883
 
 //#define NET_DOMAIN "ibms.env365.cn"
-#define NET_DOMAIN "api.env365.cn"
+//#define NET_DOMAIN "api.env365.cn"
 //#define NET_DOMAIN "xylvip.top"
+#define NET_DOMAIN "pub.env365.cn"
+//#define NET_DOMAIN "1498kn1392.imwork.net"
 #define DNS_PORT   1883
 
 uint8 log_server=0;
@@ -108,7 +110,7 @@ esp8266_reconn_cb(void){
     if (wifi_reconn_state== STATION_GOT_IP)
 	{
     	//uart0_sendStr("connect to tcp server\r\n");
-    	GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFIÄ£¿éÅäÖÃ
+    	//GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFIÄ£¿éÅäÖÃ
     	spi_flash_read(0x3C * 4096, (uint32 *)reconn_server_ip, 6);
     	os_memcpy(esp8266_reconn_ip,reconn_server_ip,4);
     	esp8266_reconn_port=reconn_server_ip[4]*256 + reconn_server_ip[5];
@@ -119,8 +121,8 @@ esp8266_reconn_cb(void){
 	else
 	{
 		//uart0_sendStr("reconnect to tcp server\r\n");
-		os_timer_setfn(&tcp_reconn_timer, (os_timer_func_t *)esp8266_reconn_cb, NULL);
-		os_timer_arm(&tcp_reconn_timer, 10000, 0);
+		//os_timer_setfn(&tcp_reconn_timer, (os_timer_func_t *)esp8266_reconn_cb, NULL);
+		//os_timer_arm(&tcp_reconn_timer, 10000, 0);
 
     }
 }
@@ -246,7 +248,7 @@ esp8266_tcp_connect_cb(void *arg){
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("tcp_success\n", 12);
 #endif
-	espconn_set_opt(pespconn,0x01);
+	//espconn_set_opt(pespconn,0x01);
 
     espconn_regist_recvcb(pespconn, esp8266_tcp_recv_cb);
     espconn_regist_sentcb(pespconn, esp8266_tcp_sent_cb);
@@ -262,11 +264,11 @@ user_dns_found(const char *name,ip_addr_t *ipaddr,void *arg){
 	if(ipaddr == NULL){
 		return;
 	}
-
 	if(tcp_server_dns_ip.addr == 0 && ipaddr->addr !=0){
 		//Í£Ö¹ÖÜÆÚ¼ì²âdns  timer
 #ifdef DEBUG_MODE
 		uart0_tx_buffer("dns_success\n", 12);
+		uart0_tx_buffer(pespconn->proto.tcp->remote_ip, 4);
 #endif
 		//os_timer_disarm(&dns_timer);
 		tcp_server_dns_ip.addr=ipaddr->addr;
@@ -288,7 +290,7 @@ connect_to_server_init(uint8 buf[],int port){
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
 	esp8266_tcp_conn.type=ESPCONN_TCP;
 	esp8266_tcp_conn.state=ESPCONN_NONE;
-
+//ÉèÖÃip
 	os_memcpy(esp8266_tcp_conn.proto.tcp->remote_ip,buf,4);
 
 	esp8266_tcp_conn.proto.tcp->remote_port=port;
@@ -332,7 +334,6 @@ connect_to_server_dns_init(void){
 #endif
 	tcp_server_dns_ip.addr = 0;
 	espconn_gethostbyname(&esp8266_tcp_conn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
-
 }
 
 

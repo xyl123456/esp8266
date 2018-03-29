@@ -68,6 +68,7 @@ udp_process_command(char *pdata, unsigned short len){
 					}
 				}
 			memset(data_buf,0,sizeof(data_buf));
+
 		}else if(!strncmp(data_buf,"SERVER PORT:",strlen("SERVER PORT:"))){
 			portconfig_cnt=1;
 			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
@@ -85,6 +86,14 @@ udp_process_command(char *pdata, unsigned short len){
 			portconfig_cnt=0;
 			spi_flash_erase_sector(0x3C);
 			spi_flash_write(0x3C * 4096, (uint32 *)set_server_ip, 6);
+
+#ifdef DEBUG_MODE
+	uart0_tx_buffer("/r/n", 2);
+	uart0_tx_buffer("/r/n", 2);
+	uart0_tx_buffer("/r/n", 2);
+	uart0_tx_buffer("/r/n", 2);
+	uart0_tx_buffer(set_server_ip, 6);
+#endif
 			system_restart();
 		}
 }
