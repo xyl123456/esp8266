@@ -24,16 +24,18 @@ extern uint8 set_server_ip[6];
 
 uint8 wifi_rssi;
 
-#define configtime 				60   //30*2
+#define configtime 				40   //40*2
 //配置状态
 #define NO_CONFIG 				0
 #define IN_CONFIG 				1
 #define COMPLETE_CONFIG 		2
+#define COMPLETE_TIMEOUT 		3
 
 int current_set_Port;
 uint8 esp8266_state;//ESP8266 工作状态
 uint8 config_state;//smartconfig 配置状态
 uint8 config_time;   //配置时间
+
 
 int8_t ipconfig_cnt=0;
 int8_t portconfig_cnt=0;
@@ -121,6 +123,9 @@ smartconfig_done(sc_status status, void *pdata){
             break;
         case SC_STATUS_GETTING_SSID_PSWD:
         {
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("smart_cf=getpss\n", 16);
+#endif
         	sc_type *type = pdata;
 			config_time = configtime;
             if (*type == SC_TYPE_ESPTOUCH)
@@ -135,10 +140,16 @@ smartconfig_done(sc_status status, void *pdata){
             break;
         case SC_STATUS_LINK:
         {
-        	struct station_config *sta_conf = pdata;
-	        	wifi_station_set_config(sta_conf);
-	        	wifi_station_disconnect();
-	        	wifi_station_connect();
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("smart_cf=link\n", 14);
+#endif
+		 	  	wifi_station_disconnect();
+
+		        struct station_config *sta_conf = pdata;
+			    wifi_station_set_config(sta_conf);
+
+			    wifi_station_connect();
+
         }
             break;
         case SC_STATUS_LINK_OVER:
@@ -149,96 +160,161 @@ smartconfig_done(sc_status status, void *pdata){
                 os_memcpy(phone_ip, (uint8*)pdata, 4);
                 //os_printf("Phone ip: %d.%d.%d.%d\n",phone_ip[0],phone_ip[1],phone_ip[2],phone_ip[3]);
 			}
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("smart_cf=link_ok\n", 17);
+#endif
+
             smartconfig_stop();
+            config_state = COMPLETE_CONFIG;
             break;
     }
 }
+
 void ICACHE_FLASH_ATTR state_check(void){
 	  uint8_t wifi_conn_state;
-	  wifi_conn_state = wifi_station_get_connect_status();//获取接口AP的状态
 
-	  //用于配置wifi-smartconfig配置状态
+	  wifi_conn_state = wifi_station_get_connect_status();//获取接口AP的状态
+	  switch(wifi_conn_state)
+	 	  {
+	 	  	  case 0:
+	 	  		esp8266_state=2;
+	 	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFI模块未配置
+	 	  		//没有配置，进入该状态
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wifi_stat=0\n", 12);
+#endif
+	 	  		break;
+	 	  	  case STATION_CONNECTING:
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wifi_stat=confing\n", 18);
+#endif
+	 	  		  break;
+	 	  	  case STATION_WRONG_PASSWORD:
+	 	  		  if(esp8266_state!=2){
+	 	  			  esp8266_state=2;
+	 	  			  smartconfig_stop();//停止配置
+	 	  		  }
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wifi_stat=wrongps\n", 18);
+#endif
+	 	  		esp8266_state=2;
+	 	  		  break;
+	 	  	  case STATION_NO_AP_FOUND:
+	 	  		  if(esp8266_state!=3){
+	 	  			esp8266_state=3;
+	 	  		  }
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wifi_stat=noap_fd\n", 18);
+#endif
+	 	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFI模块未配置
+	 	  		esp8266_state=3;
+	 	  		config_state=COMPLETE_TIMEOUT;
+	 	  		  break;
+	 	  	  case STATION_CONNECT_FAIL:
+	 	  		  if(esp8266_state!=4){
+	 	  			esp8266_state=4;
+	 	  		  }
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wifi_stat=conet_f\n", 18);
+#endif
+	 		  	GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFI模块未配置
+	 	  		esp8266_state=4;
+	 	  		  break;
+	 	  	  case STATION_GOT_IP:
+	 	  	  {
+	 	  		  if(esp8266_state!=5){
+	 				#ifdef DNS_ENABLE
+	 				#else
+	 		  			udpdata_connect();
+	 				#endif
+	 	  			esp8266_state=5;
+	 	  		  }
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wifi_stat=got_ip\n", 17);
+#endif
+	 	  		config_state=COMPLETE_CONFIG;
+	 	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFI模块获取到IP并且连接成功
+	 	  		//wifi_rssi=(wifi_station_get_rssi())&0x7F;
+	 	  		esp8266_state=5;
+	 	  	  }
+	 	  		  break;
+	 	  	  default:
+	 	  		  break;
+	 }
+	  //按键用于配置wifi-smartconfig配置状态
 	  if(!GPIO_INPUT_GET(GPIO_ID_PIN(0)))
 	  {
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("key_config=start\n", 17);
+#endif
 		  esp8266_state = 2;
 		  config_state = NO_CONFIG;
 		  config_time = configtime;
 	  }
 
-
-	  if(esp8266_state==2 || esp8266_state==3)
+//检查状态配置wifi模块
+	  if(esp8266_state==2|esp8266_state==3)
 	  {
 		  switch(config_state)//判断一键配置状态
 		  {
-		  	  case NO_CONFIG://未配置过
+		  	  case NO_CONFIG://
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wif_config=nocof\n", 17);
+#endif
+
 		  		  smartconfig_start(smartconfig_done);//开启一键连接监听
-				  //GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//GPIO14输出高电平
+				  GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//GPIO14输出高电平
+		  		  config_time = configtime;
 		  		  config_state=IN_CONFIG;
 		  		  break;
-		  	  case IN_CONFIG://正在配置,60S配置时间
-		  		  config_time--;
-		  		  if(config_time<=0)
+		  	  case IN_CONFIG://正在配置,80S配置时间
+		  		  config_time=config_time-1;
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wif_config=cfing\n", 17);
+#endif
+		  		  if(config_time==0)
 		  		  {
+		  			  config_time=configtime;
 		  			  smartconfig_stop();//停止配置
-		  			  wifi_station_connect();//连接已经配置过得AP
-		  			  config_state=COMPLETE_CONFIG;//配置完成
+		  			GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//GPIO14输出高电平
+		  			  //config_state=COMPLETE_TIMEOUT;
+		  			  //
+		  			//wifi_station_connect();
+		  			config_state=COMPLETE_TIMEOUT;
 		  		  }
 		  		  break;
-		  	  case COMPLETE_CONFIG://以配置过，直接结束判断
-		  		config_state=COMPLETE_CONFIG;
 
+		  	  case COMPLETE_CONFIG://配置过，直接结束判断
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wif_config=confd\n", 17);
+#endif
+		  		  config_state=COMPLETE_CONFIG;
+		  		  break;
+		  	  case COMPLETE_TIMEOUT:
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("wif_config=tmout\n", 17);
+#endif
 		  		  break;
 		  	  default:
 		  		  break;
 		  }
+	  }
 
-	  }
-	  switch(wifi_conn_state)
-	  {
-	  	  case 0:
-	  		esp8266_state=2;
-	  		break;
-	  	  case STATION_CONNECTING:
-	  		  break;
-	  	  case STATION_WRONG_PASSWORD:
-	  		  if(esp8266_state!=2){
-	  			  esp8266_state=2;
-	  			  smartconfig_stop();//停止配置
-	  		  }
-	  		esp8266_state=2;
-	  		config_state = NO_CONFIG;
-	  		  break;
-	  	  case STATION_NO_AP_FOUND:
-	  		  if(esp8266_state!=3){
-	  			esp8266_state=3;
-	  		  }
-	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFI模块未配置
-	  		esp8266_state=3;
-	  		config_state = NO_CONFIG;
-	  		  break;
-	  	  case STATION_CONNECT_FAIL:
-	  		  if(esp8266_state!=4){
-	  			esp8266_state=4;
-	  		  }
-		  	GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFI模块未配置
-	  		esp8266_state=4;
-	  		  break;
-	  	  case STATION_GOT_IP:
-	  	  {
-	  		  if(esp8266_state!=5){
-				#ifdef DNS_ENABLE
-				#else
-		  			udpdata_connect();
-				#endif
-	  			esp8266_state=5;
-	  		  }
-	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFI模块获取到IP并且连接成功
-	  		wifi_rssi=(wifi_station_get_rssi())&0x7F;
-	  		esp8266_state=5;
-	  	  }
-	  		  break;
-	  	  default:
-	  		  break;
-	  }
+	  timer_cnt = timer_cnt+1;
+		  if(timer_cnt==30){
+			  //60s时间到了
+			  timer_cnt=0;
+			  if(log_server==1){
+			  	//收到机制数据
+			  	log_server=0;
+			  	}else{
+			  		//连接超时，先断开当前连接，重新连接
+#ifdef DEBUG_MODE
+	 	  		uart0_tx_buffer("tcp_config=55555\n", 17);
+#endif
+			  		tcp_start_conn();
+			  	}
+		  }
+
 }
 

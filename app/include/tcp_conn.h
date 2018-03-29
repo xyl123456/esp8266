@@ -14,9 +14,14 @@ extern void connect_to_server_dns_init(void);
 extern void esp8266_socket_send(uint8 buf[],uint8 len);
 void process_command(char *pusrdata, unsigned short length);
 
+extern uint8 log_server;
+extern void tcp_delete_conn(void);
+
 uint16_t SumCheck(unsigned char *pData, unsigned char pLength);
 void espconn_init_sent(struct espconn *espconn);
 #define DNS_ENABLE  1
+
+//#define DEBUG_MODE  1
 
 typedef union tcp_init
 {

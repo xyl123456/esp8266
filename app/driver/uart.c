@@ -349,7 +349,7 @@ rx_buff_get_data_len(void){
 LOCAL void ICACHE_FLASH_ATTR ///////
 uart_recvTask(os_event_t *events)
 {
-    uint8 data_buff[128];
+    uint8 data_buff[256];
     uint8 seril_len;
     if(events->sig == 0){
     #if  UART_BUFF_EN  
@@ -365,7 +365,8 @@ uart_recvTask(os_event_t *events)
             data_buff[idx]= d_tmp;
         }
         esp8266_socket_send(data_buff,seril_len);
-        os_memset(data_buff,0,128);
+        os_memset(data_buff,0,256);
+        seril_len=0;
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);
         uart_rx_intr_enable(UART0);
     #endif

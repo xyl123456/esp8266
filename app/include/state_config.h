@@ -11,9 +11,13 @@
 extern void state_check(void);
 extern void tcp_start_conn(void);
 
+extern void tcp_re_start_conn(void);
+
 extern uint8 wifi_rssi;
 
 uint8 set_server_ip[6];
+
+uint8 timer_cnt;
 
 uint8 dev_id[4];
 
