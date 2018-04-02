@@ -35,6 +35,11 @@ extern UartDevice    UartDev;
 LOCAL struct UartBuffer* pTxBuffer = NULL;
 LOCAL struct UartBuffer* pRxBuffer = NULL;
 
+uint8 d_tmp = 0;
+uint8 idx=0;
+uint8 data_buff[128];
+uint8 seril_len;
+
 
 /*uart demo with a system task, to output what uart receives*/
 /*this is a example to process uart data from task,please change the priority to fit your application task if exists*/
@@ -283,20 +288,20 @@ uart0_rx_intr_handler(void *para)
 	/*ALL THE FUNCTIONS CALLED IN INTERRUPT HANDLER MUST BE DECLARED IN RAM */
 	/*IF NOT , POST AN EVENT AND PROCESS IN SYSTEM TASK */
     if(UART_FRM_ERR_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_FRM_ERR_INT_ST)){
-        DBG1("FRM_ERR\r\n");
+        //DBG1("FRM_ERR\r\n");
         WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_FRM_ERR_INT_CLR);
     }else if(UART_RXFIFO_FULL_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_RXFIFO_FULL_INT_ST)){
-        DBG("f");
+        //DBG("f");
         uart_rx_intr_disable(UART0);
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR);
         system_os_post(uart_recvTaskPrio, 0, 0);
     }else if(UART_RXFIFO_TOUT_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_RXFIFO_TOUT_INT_ST)){
-        DBG("t");
+        //DBG("t");
         uart_rx_intr_disable(UART0);
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_TOUT_INT_CLR);
         system_os_post(uart_recvTaskPrio, 0, 0);
     }else if(UART_TXFIFO_EMPTY_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_TXFIFO_EMPTY_INT_ST)){
-        DBG("e");
+        //DBG("e");
 	/* to output uart data from uart buffer directly in empty interrupt handler*/
 	/*instead of processing in system event, in order not to wait for current task/function to quit */
 	/*ATTENTION:*/
@@ -311,7 +316,7 @@ uart0_rx_intr_handler(void *para)
         
     }else if(UART_RXFIFO_OVF_INT_ST  == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_RXFIFO_OVF_INT_ST)){
         WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_RXFIFO_OVF_INT_CLR);
-        DBG1("RX OVF!!\r\n");
+        //DBG1("RX OVF!!\r\n");
     }
 
 
@@ -349,15 +354,12 @@ rx_buff_get_data_len(void){
 LOCAL void ICACHE_FLASH_ATTR ///////
 uart_recvTask(os_event_t *events)
 {
-    uint8 data_buff[256];
-    uint8 seril_len;
+
     if(events->sig == 0){
     #if  UART_BUFF_EN  
         Uart_rx_buff_enq();
     #else
         uint8 fifo_len = (READ_PERI_REG(UART_STATUS(UART0))>>UART_RXFIFO_CNT_S)&UART_RXFIFO_CNT;
-        uint8 d_tmp = 0;
-        uint8 idx=0;
         seril_len=fifo_len;
         for(idx=0;idx<fifo_len;idx++) {
             d_tmp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
@@ -365,10 +367,10 @@ uart_recvTask(os_event_t *events)
             data_buff[idx]= d_tmp;
         }
         esp8266_socket_send(data_buff,seril_len);
-        os_memset(data_buff,0,256);
-        seril_len=0;
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);
         uart_rx_intr_enable(UART0);
+        os_memset(data_buff,0,128);
+        seril_len=0;
     #endif
     }else if(events->sig == 1){
     #if UART_BUFF_EN

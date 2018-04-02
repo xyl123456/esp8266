@@ -27,12 +27,12 @@
 
 //ÃÀÀöÂèÂè  1883
 
-//#define NET_DOMAIN "ibms.env365.cn"
+#define NET_DOMAIN "ibms.env365.cn"
 //#define NET_DOMAIN "api.env365.cn"
 //#define NET_DOMAIN "xylvip.top"
-#define NET_DOMAIN "pub.env365.cn"
+//#define NET_DOMAIN "pub.env365.cn"
 //#define NET_DOMAIN "1498kn1392.imwork.net"
-#define DNS_PORT   1883
+#define DNS_PORT   7001
 
 uint8 log_server=0;
 
@@ -79,20 +79,8 @@ esp8266_socket_send(uint8 buf[],uint8 len){
     	if(temp_user_tcp_conn->proto.tcp->remote_ip!=0)
     	{
     		espconn_sent(temp_user_tcp_conn, buf, len);
-    		/*
-    		if(buf[4]==0x02){
-    		    os_memcpy(dev_id,buf+5,4);
-    		    spi_flash_erase_sector(0x3D);
-    		    spi_flash_write(0x3D * 4096, (uint32 *)dev_id, 4);
-    		    }else{
-    		    	if(temp_user_tcp_conn->proto.tcp->remote_ip!=0){
-    				   espconn_sent(temp_user_tcp_conn, buf, len);
-    		    	}
-    			}
-    		*/
     	}
 	}
-
 }
 
 void ICACHE_FLASH_ATTR

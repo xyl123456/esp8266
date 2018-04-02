@@ -15,9 +15,6 @@
 static struct espconn *pTcpClient;
 extern uint8 set_server_ip[6];
 
-
-//uint8 send_registdata[13]={0xEB,0x90,0x00,0x0B,0x0F,0x00,0x00,0x00,0x00,0x00,0x1A,0x0D,0x0A};
-
 os_timer_t timeraa;//wifi检测状态定时器
 os_timer_t tcp_conn_timer;//tcp连接定时器
 
