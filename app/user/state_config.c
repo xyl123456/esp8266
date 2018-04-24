@@ -202,6 +202,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 	 	  		  if(esp8266_state!=2){
 	 	  			  esp8266_state=2;
 	 	  			  smartconfig_stop();//停止配置
+	 	  			  //config_time=0;//
 	 	  		  }
 #ifdef DEBUG_MODE
 	 	  		uart0_tx_buffer("wifi_stat=wrongps\n", 18);
@@ -256,9 +257,11 @@ void ICACHE_FLASH_ATTR state_check(void){
 #ifdef DEBUG_MODE
 	 	  		uart0_tx_buffer("key_config=start\n", 17);
 #endif
+	 	  smartconfig_stop();//停止配置,为了以后用户突然的中断
 		  esp8266_state = 2;
 		  config_state = NO_CONFIG;
 		  config_time = configtime;
+
 	  }
 
 //检查状态配置wifi模块
@@ -281,13 +284,13 @@ void ICACHE_FLASH_ATTR state_check(void){
 #ifdef DEBUG_MODE
 	 	  		uart0_tx_buffer("wif_config=cfing\n", 17);
 #endif
-		  		  if(config_time==0)
+		  		  if(config_time<=0)
 		  		  {
 		  			  config_time=configtime;
 		  			  smartconfig_stop();//停止配置
-		  			GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//GPIO14输出高电平
-		  			  //config_state=COMPLETE_TIMEOUT;
-		  			  //
+		  			  GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//GPIO14输出高电平
+		  			//config_state=COMPLETE_TIMEOUT;
+		  			//
 		  			//wifi_station_connect();
 		  			config_state=COMPLETE_TIMEOUT;
 		  		  }

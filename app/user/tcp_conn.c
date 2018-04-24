@@ -32,7 +32,7 @@
 //#define NET_DOMAIN "xylvip.top"
 //#define NET_DOMAIN "pub.env365.cn"
 //#define NET_DOMAIN "1498kn1392.imwork.net"
-#define DNS_PORT   7001
+#define DNS_PORT   6000
 
 uint8 log_server=0;
 
