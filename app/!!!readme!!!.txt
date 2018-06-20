@@ -1,5 +1,7 @@
 Notice: AT added some functions so it's larger than before, if you want to compile it, please compile it as 1024KB or larger flash in compilation STEP 5.
 
+
+linux
 1¡¢compile options
 
 (1) COMPILE
