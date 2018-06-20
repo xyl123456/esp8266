@@ -1671,8 +1671,8 @@ Disassembly of section .text:
 40101071:	402415        	excw
 
 40101074 <user_init>:
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4);  //Á¨¨‰∏â‰∏™ÁÅØ
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //Á¨¨‰∫î‰∏™ÁÅØ
+#endif
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //ËæìÂá∫wifiÁöÑÁä∂ÊÄÅ
 	GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFIÊ®°ÂùóÊú™ÈÖçÁΩÆ
 }
 void user_init(void)
@@ -2593,7 +2593,7 @@ void uart_rx_intr_enable(uint8 uart_no)
 4010164d:	000000        	ill
 40101650:	fe83f0        	excw
 40101653:	3f          	.byte 0x3f
-40101654:	fe8454        	excw
+40101654:	fe8450        	excw
 40101657:	3f          	.byte 0x3f
 40101658:	f0c112        	addi	a1, a1, -16
 4010165b:	1109      	s32i.n	a0, a1, 4
@@ -4777,7 +4777,8 @@ void uart_rx_intr_enable(uint8 uart_no)
 40102c3f:	83f000        	moveqz	a15, a0, a0
 40102c42:	fe          	.byte 0xfe
 40102c43:	3f          	.byte 0x3f
-40102c44:	fe8460        	excw
+40102c44:	845c      	movi.n	a4, 88
+40102c46:	fe          	.byte 0xfe
 40102c47:	3f          	.byte 0x3f
 40102c48:	0008e1        	l32r	a14, 400c2c68 <rc4_skip+0xb4f00>
 	...
@@ -6571,7 +6572,7 @@ void uart_rx_intr_enable(uint8 uart_no)
 40103e1a:	f00d      	ret.n
 40103e1c:	fe83f0        	excw
 40103e1f:	3f          	.byte 0x3f
-40103e20:	fe8464        	excw
+40103e20:	fe8460        	excw
 40103e23:	3f          	.byte 0x3f
 40103e24:	ff          	.byte 0xff
 40103e25:	ff          	.byte 0xff
@@ -12565,7 +12566,8 @@ Disassembly of section .irom0.text:
 4024142f:	839040        	moveqz	a9, a0, a4
 40241432:	fe          	.byte 0xfe
 40241433:	3f          	.byte 0x3f
-40241434:	fe84f0        	excw
+40241434:	84ec      	bnez.n	a4, 40241460 <system_print_meminfo+0x18>
+40241436:	fe          	.byte 0xfe
 40241437:	3f          	.byte 0x3f
 40241438:	26e160        	excw
 4024143b:	e18040        	excw
@@ -16965,7 +16967,7 @@ void ICACHE_FLASH_ATTR tcp_start_conn(void){
 
 #ifdef DNS_ENABLE
 		connect_to_server_dns_init();
-40243d9d:	005305        	call0	402442d0 <connect_to_server_dns_init>
+40243d9d:	0052c5        	call0	402442cc <connect_to_server_dns_init>
 40243da0:	000706        	j	40243dc0 <tcp_start_conn+0x48>
 40243da3:	f33100        	excw
 #else
@@ -17111,11 +17113,11 @@ void ICACHE_FLASH_ATTR
 gpio_init(void){
 40243e5e:	3109      	s32i.n	a0, a1, 12
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);//ËÆæÁΩÆ‰∏∫Â§ç‰ΩçÁöÑÊåâÈîÆ  ‰∏ªË¶ÅÁî®‰∫éÈáçÊñ∞ÈÖçÁΩÆwifi
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);  //Á¨¨‰∏Ä‰∏™ÁÅØ
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);  //Á¨¨‰∫å‰∏™ÁÅØ
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO5_U, FUNC_GPIO5);  //Á¨¨Âõõ‰∏™ÁÅØ
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4);  //Á¨¨‰∏â‰∏™ÁÅØ
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //Á¨¨‰∫î‰∏™ÁÅØ
+#ifdef UDP_ENABLE
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO12);  //ÊéßÂà∂ÁªßÁîµÂô®IO
+	GPIO_OUTPUT_SET(GPIO_ID_PIN(12), 0);
+#endif
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //ËæìÂá∫wifiÁöÑÁä∂ÊÄÅ
 40243e60:	fffa21        	l32r	a2, 40243e48 <get_trans_conn+0xc>
 	//os_timer_arm(&app_data_connect_timer, 60000, 1);
 }
@@ -17126,21 +17128,21 @@ gpio_init(void){
 40243e63:	105530        	and	a5, a5, a3
 40243e66:	0020c0        	memw
 40243e69:	0459      	s32i.n	a5, a4, 0
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);  //Á¨¨‰∏Ä‰∏™ÁÅØ
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);  //Á¨¨‰∫å‰∏™ÁÅØ
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO5_U, FUNC_GPIO5);  //Á¨¨Âõõ‰∏™ÁÅØ
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4);  //Á¨¨‰∏â‰∏™ÁÅØ
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //Á¨¨‰∫î‰∏™ÁÅØ
+#ifdef UDP_ENABLE
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO12);  //ÊéßÂà∂ÁªßÁîµÂô®IO
+	GPIO_OUTPUT_SET(GPIO_ID_PIN(12), 0);
+#endif
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //ËæìÂá∫wifiÁöÑÁä∂ÊÄÅ
 40243e6b:	0020c0        	memw
 40243e6e:	0258      	l32i.n	a5, a2, 0
 	GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFIÊ®°ÂùóÊú™ÈÖçÁΩÆ
 40243e70:	fff741        	l32r	a4, 40243e4c <get_trans_conn+0x10>
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);//ËÆæÁΩÆ‰∏∫Â§ç‰ΩçÁöÑÊåâÈîÆ  ‰∏ªË¶ÅÁî®‰∫éÈáçÊñ∞ÈÖçÁΩÆwifi
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);  //Á¨¨‰∏Ä‰∏™ÁÅØ
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);  //Á¨¨‰∫å‰∏™ÁÅØ
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO5_U, FUNC_GPIO5);  //Á¨¨Âõõ‰∏™ÁÅØ
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4);  //Á¨¨‰∏â‰∏™ÁÅØ
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //Á¨¨‰∫î‰∏™ÁÅØ
+#ifdef UDP_ENABLE
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO12);  //ÊéßÂà∂ÁªßÁîµÂô®IO
+	GPIO_OUTPUT_SET(GPIO_ID_PIN(12), 0);
+#endif
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //ËæìÂá∫wifiÁöÑÁä∂ÊÄÅ
 40243e73:	103530        	and	a3, a5, a3
 40243e76:	053c      	movi.n	a5, 48
 40243e78:	203350        	or	a3, a3, a5
@@ -17168,7 +17170,7 @@ esp8266_tcp_sent_cb(void *arg){
 40243e94:	f00d      	ret.n
 40243e96:	a00000        	addx4	a0, a0, a0
 40243e99:	3ffef0        	excw
-40243e9c:	244304        	excw
+40243e9c:	244300        	extui	a4, a0, 3, 3
 40243e9f:	c11240        	mul16u	a1, a2, a4
 
 40243ea0 <esp8266_tcp_recon_cb>:
@@ -17291,7 +17293,7 @@ esp8266_tcp_discon_cb(void *arg){
 40243f20:	f048      	l32i.n	a4, a0, 60
 40243f22:	fe          	.byte 0xfe
 40243f23:	3f          	.byte 0x3f
-40243f24:	244084        	excw
+40243f24:	244080        	extui	a4, a8, 0, 3
 40243f27:	3e9440        	excw
 40243f2a:	e44024        	excw
 40243f2d:	3e          	.byte 0x3e
@@ -17361,1482 +17363,1475 @@ esp8266_tcp_connect_cb(void *arg){
 40243f6c:	f0c8      	l32i.n	a12, a0, 60
 40243f6e:	fe          	.byte 0xfe
 40243f6f:	3f          	.byte 0x3f
-40243f70:	001770        	excw
-40243f73:	3f3400        	excw
-40243f76:	a04024        	excw
-40243f79:	3e          	.byte 0x3e
-40243f7a:	124024        	excw
+40243f70:	243f34        	excw
+40243f73:	3ea040        	excw
+40243f76:	124024        	excw
 
-40243f7c <user_dns_found>:
+40243f78 <user_dns_found>:
 void ICACHE_FLASH_ATTR
 user_dns_found(const char *name,ip_addr_t *ipaddr,void *arg){
-40243f7c:	f0c112        	addi	a1, a1, -16
-40243f7f:	21c9      	s32i.n	a12, a1, 8
-40243f81:	3109      	s32i.n	a0, a1, 12
-40243f83:	11d9      	s32i.n	a13, a1, 4
-40243f85:	04cd      	mov.n	a12, a4
+40243f78:	f0c112        	addi	a1, a1, -16
+40243f7b:	21c9      	s32i.n	a12, a1, 8
+40243f7d:	3109      	s32i.n	a0, a1, 12
+40243f7f:	11d9      	s32i.n	a13, a1, 4
+40243f81:	04cd      	mov.n	a12, a4
 	struct espconn *pespconn = (struct espconn *)arg;
 	if(ipaddr == NULL){
-40243f87:	03d316        	beqz	a3, 40243fc8 <user_dns_found+0x4c>
+40243f83:	03d316        	beqz	a3, 40243fc4 <user_dns_found+0x4c>
 		return;
 	}
 	if(tcp_server_dns_ip.addr == 0 && ipaddr->addr !=0){
-40243f8a:	fff851        	l32r	a5, 40243f6c <esp8266_tcp_connect_cb+0x38>
-40243f8d:	0528      	l32i.n	a2, a5, 0
-40243f8f:	035256        	bnez	a2, 40243fc8 <user_dns_found+0x4c>
-40243f92:	0368      	l32i.n	a6, a3, 0
-40243f94:	06bc      	beqz.n	a6, 40243fc8 <user_dns_found+0x4c>
+40243f86:	fff951        	l32r	a5, 40243f6c <esp8266_tcp_connect_cb+0x38>
+40243f89:	0528      	l32i.n	a2, a5, 0
+40243f8b:	035256        	bnez	a2, 40243fc4 <user_dns_found+0x4c>
+40243f8e:	0368      	l32i.n	a6, a3, 0
+40243f90:	06bc      	beqz.n	a6, 40243fc4 <user_dns_found+0x4c>
 		uart0_tx_buffer("dns_success\n", 12);
 		uart0_tx_buffer(pespconn->proto.tcp->remote_ip, 4);
 #endif
 		//os_timer_disarm(&dns_timer);
 		tcp_server_dns_ip.addr=ipaddr->addr;
 		os_memcpy(pespconn->proto.tcp->remote_ip,&ipaddr->addr,4);
-40243f96:	2428      	l32i.n	a2, a4, 8
-40243f98:	440c      	movi.n	a4, 4
-40243f9a:	22cb      	addi.n	a2, a2, 12
+40243f92:	2428      	l32i.n	a2, a4, 8
+40243f94:	440c      	movi.n	a4, 4
+40243f96:	22cb      	addi.n	a2, a2, 12
 #ifdef DEBUG_MODE
 		uart0_tx_buffer("dns_success\n", 12);
 		uart0_tx_buffer(pespconn->proto.tcp->remote_ip, 4);
 #endif
 		//os_timer_disarm(&dns_timer);
 		tcp_server_dns_ip.addr=ipaddr->addr;
-40243f9c:	006562        	s32i	a6, a5, 0
+40243f98:	006562        	s32i	a6, a5, 0
 		os_memcpy(pespconn->proto.tcp->remote_ip,&ipaddr->addr,4);
-40243f9f:	f0ff01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-40243fa2:	0000c0        	callx0	a0
+40243f9b:	f10001        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+40243f9e:	0000c0        	callx0	a0
 		pespconn->proto.tcp->remote_port = DNS_PORT;
-40243fa5:	fff231        	l32r	a3, 40243f70 <esp8266_tcp_connect_cb+0x3c>
-40243fa8:	2c28      	l32i.n	a2, a12, 8
-40243faa:	0239      	s32i.n	a3, a2, 0
+40243fa1:	2c28      	l32i.n	a2, a12, 8
+40243fa3:	5ba732        	movi	a3, 0x75b
+40243fa6:	0239      	s32i.n	a3, a2, 0
 		pespconn->proto.tcp->local_port = espconn_port();
-40243fac:	2cd8      	l32i.n	a13, a12, 8
-40243fae:	1950c5        	call0	4025d4bc <espconn_port>
+40243fa8:	2cd8      	l32i.n	a13, a12, 8
+40243faa:	195105        	call0	4025d4bc <espconn_port>
         //◊¢≤·TCPªÿµ˜∫Ø ˝£¨¡¨Ω”≥…π¶∫Ûªÿµ˜
 		espconn_regist_connectcb(pespconn,esp8266_tcp_connect_cb);//register connect callback
-40243fb1:	fff031        	l32r	a3, 40243f74 <esp8266_tcp_connect_cb+0x40>
+40243fad:	fff031        	l32r	a3, 40243f70 <esp8266_tcp_connect_cb+0x3c>
 #endif
 		//os_timer_disarm(&dns_timer);
 		tcp_server_dns_ip.addr=ipaddr->addr;
 		os_memcpy(pespconn->proto.tcp->remote_ip,&ipaddr->addr,4);
 		pespconn->proto.tcp->remote_port = DNS_PORT;
 		pespconn->proto.tcp->local_port = espconn_port();
-40243fb4:	1d29      	s32i.n	a2, a13, 4
+40243fb0:	1d29      	s32i.n	a2, a13, 4
         //◊¢≤·TCPªÿµ˜∫Ø ˝£¨¡¨Ω”≥…π¶∫Ûªÿµ˜
 		espconn_regist_connectcb(pespconn,esp8266_tcp_connect_cb);//register connect callback
-40243fb6:	0c2d      	mov.n	a2, a12
-40243fb8:	190c45        	call0	4025d080 <espconn_regist_connectcb>
+40243fb2:	0c2d      	mov.n	a2, a12
+40243fb4:	190c85        	call0	4025d080 <espconn_regist_connectcb>
 		//Õ¯¬Á∂œø™∫Û
 		espconn_regist_reconcb(pespconn,esp8266_tcp_recon_cb);//register reconnect callback as error handler
-40243fbb:	ffef31        	l32r	a3, 40243f78 <esp8266_tcp_connect_cb+0x44>
-40243fbe:	0c2d      	mov.n	a2, a12
-40243fc0:	190d85        	call0	4025d09c <espconn_regist_reconcb>
+40243fb7:	ffef31        	l32r	a3, 40243f74 <esp8266_tcp_connect_cb+0x40>
+40243fba:	0c2d      	mov.n	a2, a12
+40243fbc:	190dc5        	call0	4025d09c <espconn_regist_reconcb>
 		espconn_connect(pespconn);
-40243fc3:	0c2d      	mov.n	a2, a12
-40243fc5:	18d445        	call0	4025cd0c <espconn_connect>
+40243fbf:	0c2d      	mov.n	a2, a12
+40243fc1:	18d485        	call0	4025cd0c <espconn_connect>
 	}
 
 }
-40243fc8:	3108      	l32i.n	a0, a1, 12
-40243fca:	21c8      	l32i.n	a12, a1, 8
-40243fcc:	11d8      	l32i.n	a13, a1, 4
-40243fce:	10c112        	addi	a1, a1, 16
-40243fd1:	f00d      	ret.n
+40243fc4:	3108      	l32i.n	a0, a1, 12
+40243fc6:	21c8      	l32i.n	a12, a1, 8
+40243fc8:	11d8      	l32i.n	a13, a1, 4
+40243fca:	10c112        	addi	a1, a1, 16
+40243fcd:	f00d      	ret.n
 	...
 
-40243fd4 <SumCheck>:
+40243fd0 <SumCheck>:
 
 
 ip_addr_t tcp_server_dns_ip;
 
 uint16_t ICACHE_FLASH_ATTR
 SumCheck(unsigned char *pData, unsigned char pLength){
-40243fd4:	743030        	extui	a3, a3, 0, 8
+40243fd0:	743030        	extui	a3, a3, 0, 8
 	uint16_t result = 0;
 	unsigned char i = 0;
 	for(i = 0; i < pLength; i++)
-40243fd7:	d39c      	beqz.n	a3, 40243ff8 <SumCheck+0x24>
-40243fd9:	330b      	addi.n	a3, a3, -1
-40243fdb:	521b      	addi.n	a5, a2, 1
-40243fdd:	743030        	extui	a3, a3, 0, 8
-40243fe0:	024d      	mov.n	a4, a2
-40243fe2:	805530        	add	a5, a5, a3
+40243fd3:	d39c      	beqz.n	a3, 40243ff4 <SumCheck+0x24>
+40243fd5:	330b      	addi.n	a3, a3, -1
+40243fd7:	521b      	addi.n	a5, a2, 1
+40243fd9:	743030        	extui	a3, a3, 0, 8
+40243fdc:	024d      	mov.n	a4, a2
+40243fde:	805530        	add	a5, a5, a3
 
 ip_addr_t tcp_server_dns_ip;
 
 uint16_t ICACHE_FLASH_ATTR
 SumCheck(unsigned char *pData, unsigned char pLength){
 	uint16_t result = 0;
-40243fe5:	00a022        	movi	a2, 0
+40243fe1:	00a022        	movi	a2, 0
 	unsigned char i = 0;
 	for(i = 0; i < pLength; i++)
 	{
 		result = result + pData[i];
-40243fe8:	000432        	l8ui	a3, a4, 0
-40243feb:	441b      	addi.n	a4, a4, 1
-40243fed:	223a      	add.n	a2, a2, a3
-40243fef:	f42020        	extui	a2, a2, 0, 16
+40243fe4:	000432        	l8ui	a3, a4, 0
+40243fe7:	441b      	addi.n	a4, a4, 1
+40243fe9:	223a      	add.n	a2, a2, a3
+40243feb:	f42020        	extui	a2, a2, 0, 16
 
 uint16_t ICACHE_FLASH_ATTR
 SumCheck(unsigned char *pData, unsigned char pLength){
 	uint16_t result = 0;
 	unsigned char i = 0;
 	for(i = 0; i < pLength; i++)
-40243ff2:	f29457        	bne	a4, a5, 40243fe8 <SumCheck+0x14>
-40243ff5:	f00d      	ret.n
-40243ff7:	032d00        	excw
+40243fee:	f29457        	bne	a4, a5, 40243fe4 <SumCheck+0x14>
+40243ff1:	f00d      	ret.n
+40243ff3:	032d00        	excw
 		result = result + pData[i];
 	}
 
 	return result;
 
 }
-40243ffa:	f00d      	ret.n
+40243ff6:	f00d      	ret.n
 
-40243ffc <esp8266_socket_send>:
+40243ff8 <esp8266_socket_send>:
 
 
 void ICACHE_FLASH_ATTR
 esp8266_socket_send(uint8 buf[],uint8 len){
-40243ffc:	f0c112        	addi	a1, a1, -16
-40243fff:	0261c2        	s32i	a12, a1, 8
-40244002:	0161d2        	s32i	a13, a1, 4
-40244005:	3109      	s32i.n	a0, a1, 12
-40244007:	02dd      	mov.n	a13, a2
-40244009:	74c030        	extui	a12, a3, 0, 8
+40243ff8:	f0c112        	addi	a1, a1, -16
+40243ffb:	0261c2        	s32i	a12, a1, 8
+40243ffe:	0161d2        	s32i	a13, a1, 4
+40244001:	3109      	s32i.n	a0, a1, 12
+40244003:	02dd      	mov.n	a13, a2
+40244005:	74c030        	extui	a12, a3, 0, 8
 	uint8_t wifi_reconn_state;
 	wifi_reconn_state=wifi_station_get_connect_status();
-4024400c:	fe3f85        	call0	40242408 <wifi_station_get_connect_status>
+40244008:	fe3fc5        	call0	40242408 <wifi_station_get_connect_status>
 	if(wifi_reconn_state==STATION_GOT_IP){
-4024400f:	115266        	bnei	a2, 5, 40244024 <esp8266_socket_send+0x28>
+4024400b:	115266        	bnei	a2, 5, 40244020 <esp8266_socket_send+0x28>
     	if(temp_user_tcp_conn->proto.tcp->remote_ip!=0)
-40244012:	ffc321        	l32r	a2, 40243f20 <esp8266_tcp_discon_cb+0x3c>
-40244015:	0228      	l32i.n	a2, a2, 0
-40244017:	2238      	l32i.n	a3, a2, 8
-40244019:	33cb      	addi.n	a3, a3, 12
-4024401b:	538c      	beqz.n	a3, 40244024 <esp8266_socket_send+0x28>
+4024400e:	ffc421        	l32r	a2, 40243f20 <esp8266_tcp_discon_cb+0x3c>
+40244011:	0228      	l32i.n	a2, a2, 0
+40244013:	2238      	l32i.n	a3, a2, 8
+40244015:	33cb      	addi.n	a3, a3, 12
+40244017:	538c      	beqz.n	a3, 40244020 <esp8266_socket_send+0x28>
     	{
     		espconn_sent(temp_user_tcp_conn, buf, len);
-4024401d:	0d3d      	mov.n	a3, a13
-4024401f:	0c4d      	mov.n	a4, a12
-40244021:	18e105        	call0	4025ce34 <espconn_send>
+40244019:	0d3d      	mov.n	a3, a13
+4024401b:	0c4d      	mov.n	a4, a12
+4024401d:	18e145        	call0	4025ce34 <espconn_send>
     	}
 	}
 }
-40244024:	3108      	l32i.n	a0, a1, 12
-40244026:	21c8      	l32i.n	a12, a1, 8
-40244028:	11d8      	l32i.n	a13, a1, 4
-4024402a:	10c112        	addi	a1, a1, 16
-4024402d:	f00d      	ret.n
-4024402f:	f00000        	subx8	a0, a0, a0
-40244032:	fe          	.byte 0xfe
-40244033:	3f          	.byte 0x3f
+40244020:	3108      	l32i.n	a0, a1, 12
+40244022:	21c8      	l32i.n	a12, a1, 8
+40244024:	11d8      	l32i.n	a13, a1, 4
+40244026:	10c112        	addi	a1, a1, 16
+40244029:	f00d      	ret.n
+4024402b:	f00000        	subx8	a0, a0, a0
+4024402e:	fe          	.byte 0xfe
+4024402f:	3f          	.byte 0x3f
 
-40244034 <process_command>:
+40244030 <process_command>:
    //data sent successfully
 
 }
 void ICACHE_FLASH_ATTR
 process_command(char *pusrdata, unsigned short length)
 {
-40244034:	80c112        	addi	a1, a1, -128
-40244037:	1e61c2        	s32i	a12, a1, 120
-4024403a:	1d61d2        	s32i	a13, a1, 116
-4024403d:	f4c030        	extui	a12, a3, 0, 16
-40244040:	02dd      	mov.n	a13, a2
+40244030:	80c112        	addi	a1, a1, -128
+40244033:	1e61c2        	s32i	a12, a1, 120
+40244036:	1d61d2        	s32i	a13, a1, 116
+40244039:	f4c030        	extui	a12, a3, 0, 16
+4024403c:	02dd      	mov.n	a13, a2
 	char re_buf[100];
 	os_memcpy(re_buf,pusrdata,length);
-40244042:	0d3d      	mov.n	a3, a13
-40244044:	012d      	mov.n	a2, a1
-40244046:	0c4d      	mov.n	a4, a12
+4024403e:	0d3d      	mov.n	a3, a13
+40244040:	012d      	mov.n	a2, a1
+40244042:	0c4d      	mov.n	a4, a12
    //data sent successfully
 
 }
 void ICACHE_FLASH_ATTR
 process_command(char *pusrdata, unsigned short length)
 {
-40244048:	1f6102        	s32i	a0, a1, 124
+40244044:	1f6102        	s32i	a0, a1, 124
 	char re_buf[100];
 	os_memcpy(re_buf,pusrdata,length);
-4024404b:	f0d401        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-4024404e:	0000c0        	callx0	a0
+40244047:	f0d501        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+4024404a:	0000c0        	callx0	a0
 	if(re_buf[4]==0x01){
-40244051:	040122        	l8ui	a2, a1, 4
-40244054:	081266        	bnei	a2, 1, 40244060 <process_command+0x2c>
+4024404d:	040122        	l8ui	a2, a1, 4
+40244050:	081266        	bnei	a2, 1, 4024405c <process_command+0x2c>
 		log_server=1;
-40244057:	fff631        	l32r	a3, 40244030 <esp8266_socket_send+0x34>
-4024405a:	004322        	s8i	a2, a3, 0
-4024405d:	000186        	j	40244067 <process_command+0x33>
+40244053:	fff631        	l32r	a3, 4024402c <esp8266_socket_send+0x34>
+40244056:	004322        	s8i	a2, a3, 0
+40244059:	000186        	j	40244063 <process_command+0x33>
 	}else{
 		uart0_tx_buffer(pusrdata,length);
-40244060:	0d2d      	mov.n	a2, a13
-40244062:	0c3d      	mov.n	a3, a12
-40244064:	00a6c5        	call0	40244ad4 <uart0_tx_buffer>
+4024405c:	0d2d      	mov.n	a2, a13
+4024405e:	0c3d      	mov.n	a3, a12
+40244060:	00a705        	call0	40244ad4 <uart0_tx_buffer>
 	}
 	os_memset(re_buf,0,100);
-40244067:	012d      	mov.n	a2, a1
-40244069:	030c      	movi.n	a3, 0
-4024406b:	64a042        	movi	a4, 100
-4024406e:	f0cf01        	l32r	a0, 402403ac <user_uart_wait_tx_fifo_empty+0x138>
-40244071:	0000c0        	callx0	a0
+40244063:	012d      	mov.n	a2, a1
+40244065:	030c      	movi.n	a3, 0
+40244067:	64a042        	movi	a4, 100
+4024406a:	f0d001        	l32r	a0, 402403ac <user_uart_wait_tx_fifo_empty+0x138>
+4024406d:	0000c0        	callx0	a0
 }
-40244074:	1f2102        	l32i	a0, a1, 124
-40244077:	80a092        	movi	a9, 128
-4024407a:	1e21c2        	l32i	a12, a1, 120
-4024407d:	1d21d2        	l32i	a13, a1, 116
-40244080:	119a      	add.n	a1, a1, a9
-40244082:	f00d      	ret.n
+40244070:	1f2102        	l32i	a0, a1, 124
+40244073:	80a092        	movi	a9, 128
+40244076:	1e21c2        	l32i	a12, a1, 120
+40244079:	1d21d2        	l32i	a13, a1, 116
+4024407c:	119a      	add.n	a1, a1, a9
+4024407e:	f00d      	ret.n
 
-40244084 <esp8266_tcp_recv_cb>:
+40244080 <esp8266_tcp_recv_cb>:
 void ICACHE_FLASH_ATTR
 esp8266_tcp_recv_cb(void *arg, char *pusrdata, unsigned short length){
-40244084:	f0c112        	addi	a1, a1, -16
-40244087:	21c9      	s32i.n	a12, a1, 8
-40244089:	11d9      	s32i.n	a13, a1, 4
-4024408b:	03cd      	mov.n	a12, a3
-4024408d:	f4d040        	extui	a13, a4, 0, 16
+40244080:	f0c112        	addi	a1, a1, -16
+40244083:	21c9      	s32i.n	a12, a1, 8
+40244085:	11d9      	s32i.n	a13, a1, 4
+40244087:	03cd      	mov.n	a12, a3
+40244089:	f4d040        	extui	a13, a4, 0, 16
 
 	process_command(pusrdata, length);
-40244090:	0d3d      	mov.n	a3, a13
-40244092:	0c2d      	mov.n	a2, a12
+4024408c:	0d3d      	mov.n	a3, a13
+4024408e:	0c2d      	mov.n	a2, a12
 		uart0_tx_buffer(pusrdata,length);
 	}
 	os_memset(re_buf,0,100);
 }
 void ICACHE_FLASH_ATTR
 esp8266_tcp_recv_cb(void *arg, char *pusrdata, unsigned short length){
-40244094:	3109      	s32i.n	a0, a1, 12
+40244090:	3109      	s32i.n	a0, a1, 12
 
 	process_command(pusrdata, length);
-40244096:	fff9c5        	call0	40244034 <process_command>
+40244092:	fff9c5        	call0	40244030 <process_command>
 	os_memset(pusrdata,0,length);
-40244099:	0c2d      	mov.n	a2, a12
-4024409b:	0d4d      	mov.n	a4, a13
-4024409d:	030c      	movi.n	a3, 0
-4024409f:	f0c301        	l32r	a0, 402403ac <user_uart_wait_tx_fifo_empty+0x138>
-402440a2:	0000c0        	callx0	a0
+40244095:	0c2d      	mov.n	a2, a12
+40244097:	0d4d      	mov.n	a4, a13
+40244099:	030c      	movi.n	a3, 0
+4024409b:	f0c401        	l32r	a0, 402403ac <user_uart_wait_tx_fifo_empty+0x138>
+4024409e:	0000c0        	callx0	a0
 	length=0;
 }
-402440a5:	3108      	l32i.n	a0, a1, 12
-402440a7:	21c8      	l32i.n	a12, a1, 8
-402440a9:	11d8      	l32i.n	a13, a1, 4
-402440ab:	10c112        	addi	a1, a1, 16
-402440ae:	f00d      	ret.n
-402440b0:	f08a      	add.n	a15, a0, a8
+402440a1:	3108      	l32i.n	a0, a1, 12
+402440a3:	21c8      	l32i.n	a12, a1, 8
+402440a5:	11d8      	l32i.n	a13, a1, 4
+402440a7:	10c112        	addi	a1, a1, 16
+402440aa:	f00d      	ret.n
+402440ac:	f08a      	add.n	a15, a0, a8
+402440ae:	fe          	.byte 0xfe
+402440af:	3f          	.byte 0x3f
+402440b0:	f088      	l32i.n	a8, a0, 60
 402440b2:	fe          	.byte 0xfe
 402440b3:	3f          	.byte 0x3f
-402440b4:	f088      	l32i.n	a8, a0, 60
-402440b6:	fe          	.byte 0xfe
-402440b7:	3f          	.byte 0x3f
-402440b8:	03d000        	rsr.208	a0
-402440bb:	f04400        	subx8	a4, a4, a0
+402440b4:	03d000        	rsr.208	a0
+402440b7:	f04400        	subx8	a4, a4, a0
+402440ba:	fe          	.byte 0xfe
+402440bb:	3f          	.byte 0x3f
+402440bc:	8388      	l32i.n	a8, a3, 32
 402440be:	fe          	.byte 0xfe
 402440bf:	3f          	.byte 0x3f
-402440c0:	8388      	l32i.n	a8, a3, 32
-402440c2:	fe          	.byte 0xfe
+402440c0:	fe8384        	excw
 402440c3:	3f          	.byte 0x3f
-402440c4:	fe8384        	excw
+402440c4:	f08d      	excw
+402440c6:	fe          	.byte 0xfe
 402440c7:	3f          	.byte 0x3f
-402440c8:	f08d      	excw
-402440ca:	fe          	.byte 0xfe
+402440c8:	fef091        	l32r	a9, 40243c88 <eagle_lwip_if_alloc+0x134>
 402440cb:	3f          	.byte 0x3f
-402440cc:	fef091        	l32r	a9, 40243c8c <eagle_lwip_if_alloc+0x138>
+402440cc:	fe8380        	excw
 402440cf:	3f          	.byte 0x3f
-402440d0:	fe8380        	excw
+402440d0:	fef094        	excw
 402440d3:	3f          	.byte 0x3f
-402440d4:	fef094        	excw
+402440d4:	837c      	movi.n	a3, -8
+402440d6:	fe          	.byte 0xfe
 402440d7:	3f          	.byte 0x3f
-402440d8:	837c      	movi.n	a3, -8
-402440da:	fe          	.byte 0xfe
+402440d8:	fef097        	bbsi	a0, 25, 402440da <esp8266_tcp_recv_cb+0x5a>
 402440db:	3f          	.byte 0x3f
-402440dc:	fef097        	bbsi	a0, 25, 402440de <esp8266_tcp_recv_cb+0x5a>
+402440dc:	8378      	l32i.n	a7, a3, 32
+402440de:	fe          	.byte 0xfe
 402440df:	3f          	.byte 0x3f
-402440e0:	8378      	l32i.n	a7, a3, 32
+402440e0:	f09c      	beqz.n	a0, 40244103 <espconn_init_sent+0x1b>
 402440e2:	fe          	.byte 0xfe
 402440e3:	3f          	.byte 0x3f
-402440e4:	f09c      	beqz.n	a0, 40244107 <espconn_init_sent+0x1b>
-402440e6:	fe          	.byte 0xfe
+402440e4:	fe8374        	excw
 402440e7:	3f          	.byte 0x3f
-402440e8:	fe8374        	excw
-402440eb:	3f          	.byte 0x3f
 
-402440ec <espconn_init_sent>:
+402440e8 <espconn_init_sent>:
 
 void ICACHE_FLASH_ATTR
 espconn_init_sent(struct espconn *espconn)
 {
-402440ec:	d0c112        	addi	a1, a1, -48
-402440ef:	71f9      	s32i.n	a15, a1, 28
+402440e8:	d0c112        	addi	a1, a1, -48
+402440eb:	71f9      	s32i.n	a15, a1, 28
 	uint16_t sum_data;
 	uint8 buf[2];
 	spi_flash_read(0x3D * 4096, (uint32 *)dev_id, 4);  //∂¡»°…Ë±∏ID
-402440f1:	fff2f1        	l32r	a15, 402440bc <esp8266_tcp_recv_cb+0x38>
+402440ed:	fff2f1        	l32r	a15, 402440b8 <esp8266_tcp_recv_cb+0x38>
 	length=0;
 }
 
 void ICACHE_FLASH_ATTR
 espconn_init_sent(struct espconn *espconn)
 {
-402440f4:	91d9      	s32i.n	a13, a1, 36
-402440f6:	02dd      	mov.n	a13, a2
+402440f0:	91d9      	s32i.n	a13, a1, 36
+402440f2:	02dd      	mov.n	a13, a2
 	uint16_t sum_data;
 	uint8 buf[2];
 	spi_flash_read(0x3D * 4096, (uint32 *)dev_id, 4);  //∂¡»°…Ë±∏ID
-402440f8:	fff021        	l32r	a2, 402440b8 <esp8266_tcp_recv_cb+0x34>
-402440fb:	0f3d      	mov.n	a3, a15
-402440fd:	440c      	movi.n	a4, 4
+402440f4:	fff021        	l32r	a2, 402440b4 <esp8266_tcp_recv_cb+0x34>
+402440f7:	0f3d      	mov.n	a3, a15
+402440f9:	440c      	movi.n	a4, 4
 	length=0;
 }
 
 void ICACHE_FLASH_ATTR
 espconn_init_sent(struct espconn *espconn)
 {
-402440ff:	b109      	s32i.n	a0, a1, 44
-40244101:	a1c9      	s32i.n	a12, a1, 40
-40244103:	0861e2        	s32i	a14, a1, 32
+402440fb:	b109      	s32i.n	a0, a1, 44
+402440fd:	a1c9      	s32i.n	a12, a1, 40
+402440ff:	0861e2        	s32i	a14, a1, 32
 	uint16_t sum_data;
 	uint8 buf[2];
 	spi_flash_read(0x3D * 4096, (uint32 *)dev_id, 4);  //∂¡»°…Ë±∏ID
-40244106:	f0a401        	l32r	a0, 40240398 <user_uart_wait_tx_fifo_empty+0x124>
-40244109:	0000c0        	callx0	a0
+40244102:	f0a501        	l32r	a0, 40240398 <user_uart_wait_tx_fifo_empty+0x124>
+40244105:	0000c0        	callx0	a0
 
 	os_memcpy(tcp_init_data.data_core.head,head_line,2);
-4024410c:	ffeac1        	l32r	a12, 402440b4 <esp8266_tcp_recv_cb+0x30>
-4024410f:	ffec31        	l32r	a3, 402440c0 <esp8266_tcp_recv_cb+0x3c>
-40244112:	240c      	movi.n	a4, 2
-40244114:	202cc0        	or	a2, a12, a12
-40244117:	f0a101        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-4024411a:	0000c0        	callx0	a0
+40244108:	ffeac1        	l32r	a12, 402440b0 <esp8266_tcp_recv_cb+0x30>
+4024410b:	ffec31        	l32r	a3, 402440bc <esp8266_tcp_recv_cb+0x3c>
+4024410e:	240c      	movi.n	a4, 2
+40244110:	202cc0        	or	a2, a12, a12
+40244113:	f0a201        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+40244116:	0000c0        	callx0	a0
 	os_memcpy(tcp_init_data.data_core.length,tcp_init_length,2);
-4024411d:	ffe4e1        	l32r	a14, 402440b0 <esp8266_tcp_recv_cb+0x2c>
-40244120:	ffe931        	l32r	a3, 402440c4 <esp8266_tcp_recv_cb+0x40>
-40244123:	240c      	movi.n	a4, 2
-40244125:	0e2d      	mov.n	a2, a14
-40244127:	f09d01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-4024412a:	0000c0        	callx0	a0
+40244119:	ffe4e1        	l32r	a14, 402440ac <esp8266_tcp_recv_cb+0x2c>
+4024411c:	ffe931        	l32r	a3, 402440c0 <esp8266_tcp_recv_cb+0x40>
+4024411f:	240c      	movi.n	a4, 2
+40244121:	0e2d      	mov.n	a2, a14
+40244123:	f09e01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+40244126:	0000c0        	callx0	a0
 	tcp_init_data.data_core.data_type=0x02;
 	os_memcpy(tcp_init_data.data_core.dev_id,dev_id,4);
-4024412d:	ffe621        	l32r	a2, 402440c8 <esp8266_tcp_recv_cb+0x44>
+40244129:	ffe621        	l32r	a2, 402440c4 <esp8266_tcp_recv_cb+0x44>
 	uint8 buf[2];
 	spi_flash_read(0x3D * 4096, (uint32 *)dev_id, 4);  //∂¡»°…Ë±∏ID
 
 	os_memcpy(tcp_init_data.data_core.head,head_line,2);
 	os_memcpy(tcp_init_data.data_core.length,tcp_init_length,2);
 	tcp_init_data.data_core.data_type=0x02;
-40244130:	250c      	movi.n	a5, 2
+4024412c:	250c      	movi.n	a5, 2
 	os_memcpy(tcp_init_data.data_core.dev_id,dev_id,4);
-40244132:	203ff0        	or	a3, a15, a15
-40244135:	04a042        	movi	a4, 4
+4024412e:	203ff0        	or	a3, a15, a15
+40244131:	04a042        	movi	a4, 4
 	uint8 buf[2];
 	spi_flash_read(0x3D * 4096, (uint32 *)dev_id, 4);  //∂¡»°…Ë±∏ID
 
 	os_memcpy(tcp_init_data.data_core.head,head_line,2);
 	os_memcpy(tcp_init_data.data_core.length,tcp_init_length,2);
 	tcp_init_data.data_core.data_type=0x02;
-40244138:	044c52        	s8i	a5, a12, 4
+40244134:	044c52        	s8i	a5, a12, 4
 	os_memcpy(tcp_init_data.data_core.dev_id,dev_id,4);
-4024413b:	f09801        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-4024413e:	0000c0        	callx0	a0
+40244137:	f09901        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+4024413a:	0000c0        	callx0	a0
 	os_memcpy(tcp_init_data.data_core.sof_dev,soft_dev,3);
-40244141:	ffe331        	l32r	a3, 402440d0 <esp8266_tcp_recv_cb+0x4c>
-40244144:	ffe221        	l32r	a2, 402440cc <esp8266_tcp_recv_cb+0x48>
-40244147:	03a042        	movi	a4, 3
-4024414a:	f09401        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-4024414d:	0000c0        	callx0	a0
+4024413d:	ffe331        	l32r	a3, 402440cc <esp8266_tcp_recv_cb+0x4c>
+40244140:	ffe221        	l32r	a2, 402440c8 <esp8266_tcp_recv_cb+0x48>
+40244143:	03a042        	movi	a4, 3
+40244146:	f09501        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+40244149:	0000c0        	callx0	a0
 	os_memcpy(tcp_init_data.data_core.hard_dev,hard_dev,3);
-40244150:	ffe231        	l32r	a3, 402440d8 <esp8266_tcp_recv_cb+0x54>
-40244153:	ffe021        	l32r	a2, 402440d4 <esp8266_tcp_recv_cb+0x50>
-40244156:	340c      	movi.n	a4, 3
-40244158:	f09101        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-4024415b:	0000c0        	callx0	a0
+4024414c:	ffe231        	l32r	a3, 402440d4 <esp8266_tcp_recv_cb+0x54>
+4024414f:	ffe021        	l32r	a2, 402440d0 <esp8266_tcp_recv_cb+0x50>
+40244152:	340c      	movi.n	a4, 3
+40244154:	f09201        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+40244157:	0000c0        	callx0	a0
 	os_memcpy(tcp_init_data.data_core.heat_time,heat_time,3);
-4024415e:	ffdf21        	l32r	a2, 402440dc <esp8266_tcp_recv_cb+0x58>
-40244161:	ffdf31        	l32r	a3, 402440e0 <esp8266_tcp_recv_cb+0x5c>
-40244164:	340c      	movi.n	a4, 3
-40244166:	f08d01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-40244169:	0000c0        	callx0	a0
-4024416c:	12cc22        	addi	a2, a12, 18
-4024416f:	0e4d      	mov.n	a4, a14
-40244171:	026d      	mov.n	a6, a2
+4024415a:	ffdf21        	l32r	a2, 402440d8 <esp8266_tcp_recv_cb+0x58>
+4024415d:	ffdf31        	l32r	a3, 402440dc <esp8266_tcp_recv_cb+0x5c>
+40244160:	340c      	movi.n	a4, 3
+40244162:	f08e01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+40244165:	0000c0        	callx0	a0
+40244168:	12cc22        	addi	a2, a12, 18
+4024416b:	0e4d      	mov.n	a4, a14
+4024416d:	026d      	mov.n	a6, a2
 
 ip_addr_t tcp_server_dns_ip;
 
 uint16_t ICACHE_FLASH_ATTR
 SumCheck(unsigned char *pData, unsigned char pLength){
 	uint16_t result = 0;
-40244173:	050c      	movi.n	a5, 0
+4024416f:	050c      	movi.n	a5, 0
 	unsigned char i = 0;
 	for(i = 0; i < pLength; i++)
 	{
 		result = result + pData[i];
-40244175:	000432        	l8ui	a3, a4, 0
-40244178:	441b      	addi.n	a4, a4, 1
-4024417a:	553a      	add.n	a5, a5, a3
-4024417c:	f45050        	extui	a5, a5, 0, 16
+40244171:	000432        	l8ui	a3, a4, 0
+40244174:	441b      	addi.n	a4, a4, 1
+40244176:	553a      	add.n	a5, a5, a3
+40244178:	f45050        	extui	a5, a5, 0, 16
 
 uint16_t ICACHE_FLASH_ATTR
 SumCheck(unsigned char *pData, unsigned char pLength){
 	uint16_t result = 0;
 	unsigned char i = 0;
 	for(i = 0; i < pLength; i++)
-4024417f:	f29467        	bne	a4, a6, 40244175 <espconn_init_sent+0x89>
+4024417b:	f29467        	bne	a4, a6, 40244171 <espconn_init_sent+0x89>
 	os_memcpy(tcp_init_data.data_core.hard_dev,hard_dev,3);
 	os_memcpy(tcp_init_data.data_core.heat_time,heat_time,3);
 	//tcp_init_data.data_core.rssi=wifi_rssi;
 
 	sum_data=SumCheck(tcp_init_data.data_buf+2,16);
 	buf[0]=(sum_data>>8)&0xFF;
-40244182:	416850        	srli	a6, a5, 8
+4024417e:	416850        	srli	a6, a5, 8
 	buf[1]=sum_data&0xFF;
 	os_memcpy(tcp_init_data.data_core.crc_data,buf,2);
-40244185:	013d      	mov.n	a3, a1
-40244187:	240c      	movi.n	a4, 2
+40244181:	013d      	mov.n	a3, a1
+40244183:	240c      	movi.n	a4, 2
 	os_memcpy(tcp_init_data.data_core.hard_dev,hard_dev,3);
 	os_memcpy(tcp_init_data.data_core.heat_time,heat_time,3);
 	//tcp_init_data.data_core.rssi=wifi_rssi;
 
 	sum_data=SumCheck(tcp_init_data.data_buf+2,16);
 	buf[0]=(sum_data>>8)&0xFF;
-40244189:	004162        	s8i	a6, a1, 0
+40244185:	004162        	s8i	a6, a1, 0
 	buf[1]=sum_data&0xFF;
-4024418c:	014152        	s8i	a5, a1, 1
+40244188:	014152        	s8i	a5, a1, 1
 	os_memcpy(tcp_init_data.data_core.crc_data,buf,2);
-4024418f:	f08301        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-40244192:	0000c0        	callx0	a0
+4024418b:	f08401        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+4024418e:	0000c0        	callx0	a0
 	os_memcpy(tcp_init_data.data_core.tail_data,tail_data,2);
-40244195:	ffd431        	l32r	a3, 402440e8 <esp8266_tcp_recv_cb+0x64>
-40244198:	ffd321        	l32r	a2, 402440e4 <esp8266_tcp_recv_cb+0x60>
-4024419b:	240c      	movi.n	a4, 2
-4024419d:	f07f01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-402441a0:	0000c0        	callx0	a0
+40244191:	ffd431        	l32r	a3, 402440e4 <esp8266_tcp_recv_cb+0x64>
+40244194:	ffd321        	l32r	a2, 402440e0 <esp8266_tcp_recv_cb+0x60>
+40244197:	240c      	movi.n	a4, 2
+40244199:	f08001        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+4024419c:	0000c0        	callx0	a0
 	espconn_sent(espconn,tcp_init_data.data_buf,22);
-402441a3:	0d2d      	mov.n	a2, a13
-402441a5:	0c3d      	mov.n	a3, a12
-402441a7:	641c      	movi.n	a4, 22
-402441a9:	18c885        	call0	4025ce34 <espconn_send>
+4024419f:	0d2d      	mov.n	a2, a13
+402441a1:	0c3d      	mov.n	a3, a12
+402441a3:	641c      	movi.n	a4, 22
+402441a5:	18c8c5        	call0	4025ce34 <espconn_send>
 }
-402441ac:	b108      	l32i.n	a0, a1, 44
-402441ae:	a1c8      	l32i.n	a12, a1, 40
-402441b0:	91d8      	l32i.n	a13, a1, 36
-402441b2:	81e8      	l32i.n	a14, a1, 32
-402441b4:	71f8      	l32i.n	a15, a1, 28
-402441b6:	30c112        	addi	a1, a1, 48
-402441b9:	f00d      	ret.n
-402441bb:	f06c00        	subx8	a6, a12, a0
+402441a8:	b108      	l32i.n	a0, a1, 44
+402441aa:	a1c8      	l32i.n	a12, a1, 40
+402441ac:	91d8      	l32i.n	a13, a1, 36
+402441ae:	81e8      	l32i.n	a14, a1, 32
+402441b0:	71f8      	l32i.n	a15, a1, 28
+402441b2:	30c112        	addi	a1, a1, 48
+402441b5:	f00d      	ret.n
+402441b7:	f06c00        	subx8	a6, a12, a0
+402441ba:	fe          	.byte 0xfe
+402441bb:	3f          	.byte 0x3f
+402441bc:	f04c      	movi.n	a0, 79
 402441be:	fe          	.byte 0xfe
 402441bf:	3f          	.byte 0x3f
-402441c0:	f04c      	movi.n	a0, 79
+402441c0:	f058      	l32i.n	a5, a0, 60
 402441c2:	fe          	.byte 0xfe
 402441c3:	3f          	.byte 0x3f
-402441c4:	f058      	l32i.n	a5, a0, 60
-402441c6:	fe          	.byte 0xfe
-402441c7:	3f          	.byte 0x3f
 
-402441c8 <connect_to_server_init>:
+402441c4 <connect_to_server_init>:
 	}
 
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_init(uint8 buf[],int port){
-402441c8:	f0c112        	addi	a1, a1, -16
-402441cb:	025d      	mov.n	a5, a2
-402441cd:	21c9      	s32i.n	a12, a1, 8
-402441cf:	01e9      	s32i.n	a14, a1, 0
+402441c4:	f0c112        	addi	a1, a1, -16
+402441c7:	025d      	mov.n	a5, a2
+402441c9:	21c9      	s32i.n	a12, a1, 8
+402441cb:	01e9      	s32i.n	a14, a1, 0
 
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
-402441d1:	fffac1        	l32r	a12, 402441bc <espconn_init_sent+0xd0>
+402441cd:	fffac1        	l32r	a12, 402441b8 <espconn_init_sent+0xd0>
 	}
 
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_init(uint8 buf[],int port){
-402441d4:	03ed      	mov.n	a14, a3
+402441d0:	03ed      	mov.n	a14, a3
 
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
 	esp8266_tcp_conn.type=ESPCONN_TCP;
 	esp8266_tcp_conn.state=ESPCONN_NONE;
 //…Ë÷√ip
 	os_memcpy(esp8266_tcp_conn.proto.tcp->remote_ip,buf,4);
-402441d6:	053d      	mov.n	a3, a5
+402441d2:	053d      	mov.n	a3, a5
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_init(uint8 buf[],int port){
 
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
-402441d8:	fffa51        	l32r	a5, 402441c0 <espconn_init_sent+0xd4>
+402441d4:	fffa51        	l32r	a5, 402441bc <espconn_init_sent+0xd4>
 	}
 
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_init(uint8 buf[],int port){
-402441db:	3109      	s32i.n	a0, a1, 12
-402441dd:	11d9      	s32i.n	a13, a1, 4
+402441d7:	3109      	s32i.n	a0, a1, 12
+402441d9:	11d9      	s32i.n	a13, a1, 4
 
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
-402441df:	2c59      	s32i.n	a5, a12, 8
+402441db:	2c59      	s32i.n	a5, a12, 8
 	esp8266_tcp_conn.type=ESPCONN_TCP;
 	esp8266_tcp_conn.state=ESPCONN_NONE;
 //…Ë÷√ip
 	os_memcpy(esp8266_tcp_conn.proto.tcp->remote_ip,buf,4);
-402441e1:	fff821        	l32r	a2, 402441c4 <espconn_init_sent+0xd8>
+402441dd:	fff821        	l32r	a2, 402441c0 <espconn_init_sent+0xd8>
 
 void ICACHE_FLASH_ATTR
 connect_to_server_init(uint8 buf[],int port){
 
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
 	esp8266_tcp_conn.type=ESPCONN_TCP;
-402441e4:	051c      	movi.n	a5, 16
+402441e0:	051c      	movi.n	a5, 16
 	esp8266_tcp_conn.state=ESPCONN_NONE;
 //…Ë÷√ip
 	os_memcpy(esp8266_tcp_conn.proto.tcp->remote_ip,buf,4);
-402441e6:	440c      	movi.n	a4, 4
+402441e2:	440c      	movi.n	a4, 4
 
 void ICACHE_FLASH_ATTR
 connect_to_server_init(uint8 buf[],int port){
 
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
 	esp8266_tcp_conn.type=ESPCONN_TCP;
-402441e8:	0c59      	s32i.n	a5, a12, 0
+402441e4:	0c59      	s32i.n	a5, a12, 0
 	esp8266_tcp_conn.state=ESPCONN_NONE;
-402441ea:	00a052        	movi	a5, 0
-402441ed:	016c52        	s32i	a5, a12, 4
+402441e6:	00a052        	movi	a5, 0
+402441e9:	016c52        	s32i	a5, a12, 4
 //…Ë÷√ip
 	os_memcpy(esp8266_tcp_conn.proto.tcp->remote_ip,buf,4);
-402441f0:	f06b01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-402441f3:	0000c0        	callx0	a0
+402441ec:	f06c01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+402441ef:	0000c0        	callx0	a0
 
 	esp8266_tcp_conn.proto.tcp->remote_port=port;
-402441f6:	2cd8      	l32i.n	a13, a12, 8
-402441f8:	0de9      	s32i.n	a14, a13, 0
+402441f2:	2cd8      	l32i.n	a13, a12, 8
+402441f4:	0de9      	s32i.n	a14, a13, 0
 	esp8266_tcp_conn.proto.tcp->local_port = espconn_port(); //local port of ESP8266
-402441fa:	192c05        	call0	4025d4bc <espconn_port>
+402441f6:	192c45        	call0	4025d4bc <espconn_port>
 
     espconn_regist_connectcb(&esp8266_tcp_conn, esp8266_tcp_connect_cb); // register connect callback
-402441fd:	ff5d31        	l32r	a3, 40243f74 <esp8266_tcp_connect_cb+0x40>
+402441f9:	ff5d31        	l32r	a3, 40243f70 <esp8266_tcp_connect_cb+0x3c>
 	esp8266_tcp_conn.state=ESPCONN_NONE;
 //…Ë÷√ip
 	os_memcpy(esp8266_tcp_conn.proto.tcp->remote_ip,buf,4);
 
 	esp8266_tcp_conn.proto.tcp->remote_port=port;
 	esp8266_tcp_conn.proto.tcp->local_port = espconn_port(); //local port of ESP8266
-40244200:	1d29      	s32i.n	a2, a13, 4
+402441fc:	1d29      	s32i.n	a2, a13, 4
 
     espconn_regist_connectcb(&esp8266_tcp_conn, esp8266_tcp_connect_cb); // register connect callback
-40244202:	0c2d      	mov.n	a2, a12
-40244204:	18e785        	call0	4025d080 <espconn_regist_connectcb>
+402441fe:	0c2d      	mov.n	a2, a12
+40244200:	18e7c5        	call0	4025d080 <espconn_regist_connectcb>
     espconn_regist_reconcb(&esp8266_tcp_conn, esp8266_tcp_recon_cb);     // register reconnect callback as error handler
-40244207:	ff5c31        	l32r	a3, 40243f78 <esp8266_tcp_connect_cb+0x44>
-4024420a:	0c2d      	mov.n	a2, a12
-4024420c:	18e8c5        	call0	4025d09c <espconn_regist_reconcb>
+40244203:	ff5c31        	l32r	a3, 40243f74 <esp8266_tcp_connect_cb+0x40>
+40244206:	0c2d      	mov.n	a2, a12
+40244208:	18e905        	call0	4025d09c <espconn_regist_reconcb>
 
     espconn_connect(&esp8266_tcp_conn);
-4024420f:	0c2d      	mov.n	a2, a12
-40244211:	18af85        	call0	4025cd0c <espconn_connect>
+4024420b:	0c2d      	mov.n	a2, a12
+4024420d:	18afc5        	call0	4025cd0c <espconn_connect>
 
 }
-40244214:	3108      	l32i.n	a0, a1, 12
-40244216:	21c8      	l32i.n	a12, a1, 8
-40244218:	11d8      	l32i.n	a13, a1, 4
-4024421a:	01e8      	l32i.n	a14, a1, 0
-4024421c:	10c112        	addi	a1, a1, 16
-4024421f:	f00d      	ret.n
-40244221:	000000        	ill
-40244224:	03c000        	rsr.depc	a0
+40244210:	3108      	l32i.n	a0, a1, 12
+40244212:	21c8      	l32i.n	a12, a1, 8
+40244214:	11d8      	l32i.n	a13, a1, 4
+40244216:	01e8      	l32i.n	a14, a1, 0
+40244218:	10c112        	addi	a1, a1, 16
+4024421b:	f00d      	ret.n
+4024421d:	000000        	ill
+40244220:	03c000        	rsr.depc	a0
 	...
 
-40244228 <esp8266_reconn_cb>:
+40244224 <esp8266_reconn_cb>:
 void ICACHE_FLASH_ATTR
 esp8266_reconn_cb(void){
 	uint8_t reconn_server_ip[6];
 	uint8_t esp8266_reconn_ip[4];
 	uint16 esp8266_reconn_port;
 	os_timer_disarm(&tcp_reconn_timer);
-40244228:	ff1c21        	l32r	a2, 40243e98 <esp8266_tcp_sent_cb+0x4>
+40244224:	ff1d21        	l32r	a2, 40243e98 <esp8266_tcp_sent_cb+0x4>
     	}
 	}
 }
 
 void ICACHE_FLASH_ATTR
 esp8266_reconn_cb(void){
-4024422b:	d0c112        	addi	a1, a1, -48
-4024422e:	0b6102        	s32i	a0, a1, 44
+40244227:	d0c112        	addi	a1, a1, -48
+4024422a:	0b6102        	s32i	a0, a1, 44
 	uint8_t reconn_server_ip[6];
 	uint8_t esp8266_reconn_ip[4];
 	uint16 esp8266_reconn_port;
 	os_timer_disarm(&tcp_reconn_timer);
-40244231:	f06101        	l32r	a0, 402403b8 <user_uart_wait_tx_fifo_empty+0x144>
-40244234:	0000c0        	callx0	a0
+4024422d:	f06201        	l32r	a0, 402403b8 <user_uart_wait_tx_fifo_empty+0x144>
+40244230:	0000c0        	callx0	a0
 
 	struct ip_info ipconfig;
 	wifi_get_ip_info(STATION_IF, &ipconfig);
-40244237:	203110        	or	a3, a1, a1
-4024423a:	020c      	movi.n	a2, 0
-4024423c:	fee445        	call0	40243084 <wifi_get_ip_info>
+40244233:	203110        	or	a3, a1, a1
+40244236:	020c      	movi.n	a2, 0
+40244238:	fee485        	call0	40243084 <wifi_get_ip_info>
 
 	uint8_t wifi_reconn_state;
 	wifi_reconn_state=wifi_station_get_connect_status();
-4024423f:	fe1c85        	call0	40242408 <wifi_station_get_connect_status>
+4024423b:	fe1cc5        	call0	40242408 <wifi_station_get_connect_status>
     if (wifi_reconn_state== STATION_GOT_IP)
-40244242:	2e5266        	bnei	a2, 5, 40244274 <esp8266_reconn_cb+0x4c>
+4024423e:	2e5266        	bnei	a2, 5, 40244270 <esp8266_reconn_cb+0x4c>
 	{
     	//uart0_sendStr("connect to tcp server\r\n");
     	//GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFIƒ£øÈ≈‰÷√
     	spi_flash_read(0x3C * 4096, (uint32 *)reconn_server_ip, 6);
-40244245:	fff721        	l32r	a2, 40244224 <connect_to_server_init+0x5c>
-40244248:	31cb      	addi.n	a3, a1, 12
-4024424a:	640c      	movi.n	a4, 6
-4024424c:	f05301        	l32r	a0, 40240398 <user_uart_wait_tx_fifo_empty+0x124>
-4024424f:	0000c0        	callx0	a0
+40244241:	fff721        	l32r	a2, 40244220 <connect_to_server_init+0x5c>
+40244244:	31cb      	addi.n	a3, a1, 12
+40244246:	640c      	movi.n	a4, 6
+40244248:	f05401        	l32r	a0, 40240398 <user_uart_wait_tx_fifo_empty+0x124>
+4024424b:	0000c0        	callx0	a0
     	os_memcpy(esp8266_reconn_ip,reconn_server_ip,4);
-40244252:	31cb      	addi.n	a3, a1, 12
-40244254:	12c122        	addi	a2, a1, 18
-40244257:	04a042        	movi	a4, 4
-4024425a:	f05001        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-4024425d:	0000c0        	callx0	a0
+4024424e:	31cb      	addi.n	a3, a1, 12
+40244250:	12c122        	addi	a2, a1, 18
+40244253:	04a042        	movi	a4, 4
+40244256:	f05101        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+40244259:	0000c0        	callx0	a0
     	esp8266_reconn_port=reconn_server_ip[4]*256 + reconn_server_ip[5];
-40244260:	100132        	l8ui	a3, a1, 16
-40244263:	110122        	l8ui	a2, a1, 17
-40244266:	113380        	slli	a3, a3, 8
-40244269:	323a      	add.n	a3, a2, a3
+4024425c:	100132        	l8ui	a3, a1, 16
+4024425f:	110122        	l8ui	a2, a1, 17
+40244262:	113380        	slli	a3, a3, 8
+40244265:	323a      	add.n	a3, a2, a3
 
     	connect_to_server_init(esp8266_reconn_ip,esp8266_reconn_port);
-4024426b:	f43030        	extui	a3, a3, 0, 16
-4024426e:	12c122        	addi	a2, a1, 18
-40244271:	fff545        	call0	402441c8 <connect_to_server_init>
+40244267:	f43030        	extui	a3, a3, 0, 16
+4024426a:	12c122        	addi	a2, a1, 18
+4024426d:	fff545        	call0	402441c4 <connect_to_server_init>
 		//uart0_sendStr("reconnect to tcp server\r\n");
 		//os_timer_setfn(&tcp_reconn_timer, (os_timer_func_t *)esp8266_reconn_cb, NULL);
 		//os_timer_arm(&tcp_reconn_timer, 10000, 0);
 
     }
 }
-40244274:	b108      	l32i.n	a0, a1, 44
-40244276:	30c112        	addi	a1, a1, 48
-40244279:	f00d      	ret.n
+40244270:	b108      	l32i.n	a0, a1, 44
+40244272:	30c112        	addi	a1, a1, 48
+40244275:	f00d      	ret.n
 	...
 
-4024427c <tcp_delete_conn>:
+40244278 <tcp_delete_conn>:
 tcp_delete_conn(void)
 {
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("delete_tcpconn\n", 15);
 #endif
 	espconn_set_opt(&esp8266_tcp_conn,0);
-4024427c:	ffd021        	l32r	a2, 402441bc <espconn_init_sent+0xd0>
+40244278:	ffd021        	l32r	a2, 402441b8 <espconn_init_sent+0xd0>
 }
 
 
 void ICACHE_FLASH_ATTR
 tcp_delete_conn(void)
 {
-4024427f:	f0c112        	addi	a1, a1, -16
+4024427b:	f0c112        	addi	a1, a1, -16
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("delete_tcpconn\n", 15);
 #endif
 	espconn_set_opt(&esp8266_tcp_conn,0);
-40244282:	00a032        	movi	a3, 0
+4024427e:	00a032        	movi	a3, 0
 }
 
 
 void ICACHE_FLASH_ATTR
 tcp_delete_conn(void)
 {
-40244285:	036102        	s32i	a0, a1, 12
+40244281:	036102        	s32i	a0, a1, 12
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("delete_tcpconn\n", 15);
 #endif
 	espconn_set_opt(&esp8266_tcp_conn,0);
-40244288:	190545        	call0	4025d2e0 <espconn_set_opt>
+40244284:	190585        	call0	4025d2e0 <espconn_set_opt>
 }
-4024428b:	032102        	l32i	a0, a1, 12
-4024428e:	10c112        	addi	a1, a1, 16
-40244291:	f00d      	ret.n
-40244293:	840800        	extui	a0, a0, 8, 9
-40244296:	fe          	.byte 0xfe
-40244297:	3f          	.byte 0x3f
-40244298:	3f7c      	movi.n	a15, -13
-4024429a:	b44024        	excw
-4024429d:	3ffef0        	excw
-402442a0:	1388      	l32i.n	a8, a3, 4
+40244287:	032102        	l32i	a0, a1, 12
+4024428a:	10c112        	addi	a1, a1, 16
+4024428d:	f00d      	ret.n
+4024428f:	840800        	extui	a0, a0, 8, 9
+40244292:	fe          	.byte 0xfe
+40244293:	3f          	.byte 0x3f
+40244294:	3f78      	l32i.n	a7, a15, 12
+40244296:	b44024        	excw
+40244299:	3ffef0        	excw
+4024429c:	1388      	l32i.n	a8, a3, 4
 	...
 
-402442a4 <user_dns_check_cb>:
+402442a0 <user_dns_check_cb>:
 {
 	struct espconn *pespconn = arg;
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("dns_reconnect\n", 14);
 #endif
 	espconn_gethostbyname(pespconn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
-402442a4:	fffc31        	l32r	a3, 40244294 <tcp_delete_conn+0x18>
-402442a7:	ff3141        	l32r	a4, 40243f6c <esp8266_tcp_connect_cb+0x38>
-402442aa:	fffb51        	l32r	a5, 40244298 <tcp_delete_conn+0x1c>
+402442a0:	fffc31        	l32r	a3, 40244290 <tcp_delete_conn+0x18>
+402442a3:	ff3241        	l32r	a4, 40243f6c <esp8266_tcp_connect_cb+0x38>
+402442a6:	fffb51        	l32r	a5, 40244294 <tcp_delete_conn+0x1c>
 #endif
 	espconn_set_opt(&esp8266_tcp_conn,0);
 }
 void ICACHE_FLASH_ATTR
 user_dns_check_cb(void *arg)
 {
-402442ad:	f0c112        	addi	a1, a1, -16
-402442b0:	036102        	s32i	a0, a1, 12
+402442a9:	f0c112        	addi	a1, a1, -16
+402442ac:	036102        	s32i	a0, a1, 12
 	struct espconn *pespconn = arg;
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("dns_reconnect\n", 14);
 #endif
 	espconn_gethostbyname(pespconn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
-402442b3:	192405        	call0	4025d4f4 <espconn_gethostbyname>
+402442af:	192445        	call0	4025d4f4 <espconn_gethostbyname>
 	os_timer_arm(&dns_timer, 5000, 0);
-402442b6:	fff921        	l32r	a2, 4024429c <tcp_delete_conn+0x20>
-402442b9:	fff931        	l32r	a3, 402442a0 <tcp_delete_conn+0x24>
-402442bc:	00a042        	movi	a4, 0
-402442bf:	01a052        	movi	a5, 1
-402442c2:	f03e01        	l32r	a0, 402403bc <user_uart_wait_tx_fifo_empty+0x148>
-402442c5:	0000c0        	callx0	a0
+402442b2:	fff921        	l32r	a2, 40244298 <tcp_delete_conn+0x20>
+402442b5:	fff931        	l32r	a3, 4024429c <tcp_delete_conn+0x24>
+402442b8:	00a042        	movi	a4, 0
+402442bb:	01a052        	movi	a5, 1
+402442be:	f03f01        	l32r	a0, 402403bc <user_uart_wait_tx_fifo_empty+0x148>
+402442c1:	0000c0        	callx0	a0
 }
-402442c8:	3108      	l32i.n	a0, a1, 12
-402442ca:	10c112        	addi	a1, a1, 16
-402442cd:	f00d      	ret.n
+402442c4:	3108      	l32i.n	a0, a1, 12
+402442c6:	10c112        	addi	a1, a1, 16
+402442c9:	f00d      	ret.n
 	...
 
-402442d0 <connect_to_server_dns_init>:
+402442cc <connect_to_server_dns_init>:
 
 void ICACHE_FLASH_ATTR
 connect_to_server_dns_init(void){
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
-402442d0:	ffbb61        	l32r	a6, 402441bc <espconn_init_sent+0xd0>
+402442cc:	ffbb61        	l32r	a6, 402441b8 <espconn_init_sent+0xd0>
 	espconn_gethostbyname(pespconn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
 	os_timer_arm(&dns_timer, 5000, 0);
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_dns_init(void){
-402442d3:	f0c112        	addi	a1, a1, -16
+402442cf:	f0c112        	addi	a1, a1, -16
 	esp8266_tcp_conn.state=ESPCONN_NONE;
 	//connect to tcp server as NET_DOMAIN
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("dns_init\n", 9);
 #endif
 	tcp_server_dns_ip.addr = 0;
-402442d6:	ff2571        	l32r	a7, 40243f6c <esp8266_tcp_connect_cb+0x38>
+402442d2:	ff2671        	l32r	a7, 40243f6c <esp8266_tcp_connect_cb+0x38>
 	os_timer_arm(&dns_timer, 5000, 0);
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_dns_init(void){
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
-402442d9:	ffb991        	l32r	a9, 402441c0 <espconn_init_sent+0xd4>
+402442d5:	ffb991        	l32r	a9, 402441bc <espconn_init_sent+0xd4>
 	espconn_gethostbyname(pespconn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
 	os_timer_arm(&dns_timer, 5000, 0);
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_dns_init(void){
-402442dc:	036102        	s32i	a0, a1, 12
+402442d8:	036102        	s32i	a0, a1, 12
 	//connect to tcp server as NET_DOMAIN
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("dns_init\n", 9);
 #endif
 	tcp_server_dns_ip.addr = 0;
 	espconn_gethostbyname(&esp8266_tcp_conn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
-402442df:	ffed31        	l32r	a3, 40244294 <tcp_delete_conn+0x18>
-402442e2:	ffed51        	l32r	a5, 40244298 <tcp_delete_conn+0x1c>
+402442db:	ffed31        	l32r	a3, 40244290 <tcp_delete_conn+0x18>
+402442de:	ffed51        	l32r	a5, 40244294 <tcp_delete_conn+0x1c>
 
 void ICACHE_FLASH_ATTR
 connect_to_server_dns_init(void){
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
 	esp8266_tcp_conn.type=ESPCONN_TCP;
 	esp8266_tcp_conn.state=ESPCONN_NONE;
-402442e5:	00a082        	movi	a8, 0
+402442e1:	00a082        	movi	a8, 0
 	os_timer_arm(&dns_timer, 5000, 0);
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_dns_init(void){
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
-402442e8:	026692        	s32i	a9, a6, 8
+402442e4:	026692        	s32i	a9, a6, 8
 	//connect to tcp server as NET_DOMAIN
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("dns_init\n", 9);
 #endif
 	tcp_server_dns_ip.addr = 0;
 	espconn_gethostbyname(&esp8266_tcp_conn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
-402442eb:	062d      	mov.n	a2, a6
+402442e7:	062d      	mov.n	a2, a6
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_dns_init(void){
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
 	esp8266_tcp_conn.type=ESPCONN_TCP;
-402442ed:	091c      	movi.n	a9, 16
+402442e9:	091c      	movi.n	a9, 16
 	//connect to tcp server as NET_DOMAIN
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("dns_init\n", 9);
 #endif
 	tcp_server_dns_ip.addr = 0;
 	espconn_gethostbyname(&esp8266_tcp_conn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
-402442ef:	074d      	mov.n	a4, a7
+402442eb:	074d      	mov.n	a4, a7
 }
 
 void ICACHE_FLASH_ATTR
 connect_to_server_dns_init(void){
 	esp8266_tcp_conn.proto.tcp=&user_tcp;
 	esp8266_tcp_conn.type=ESPCONN_TCP;
-402442f1:	0699      	s32i.n	a9, a6, 0
+402442ed:	0699      	s32i.n	a9, a6, 0
 	esp8266_tcp_conn.state=ESPCONN_NONE;
-402442f3:	1689      	s32i.n	a8, a6, 4
+402442ef:	1689      	s32i.n	a8, a6, 4
 	//connect to tcp server as NET_DOMAIN
 #ifdef DEBUG_MODE
 	uart0_tx_buffer("dns_init\n", 9);
 #endif
 	tcp_server_dns_ip.addr = 0;
-402442f5:	0789      	s32i.n	a8, a7, 0
+402442f1:	0789      	s32i.n	a8, a7, 0
 	espconn_gethostbyname(&esp8266_tcp_conn,NET_DOMAIN,&tcp_server_dns_ip,user_dns_found);
-402442f7:	191fc5        	call0	4025d4f4 <espconn_gethostbyname>
+402442f3:	192005        	call0	4025d4f4 <espconn_gethostbyname>
 }
-402442fa:	3108      	l32i.n	a0, a1, 12
-402442fc:	10c112        	addi	a1, a1, 16
-402442ff:	f00d      	ret.n
-40244301:	000000        	ill
+402442f6:	3108      	l32i.n	a0, a1, 12
+402442f8:	10c112        	addi	a1, a1, 16
+402442fb:	f00d      	ret.n
+402442fd:	000000        	ill
 
-40244304 <esp8266_reconn_dns_cb>:
+40244300 <esp8266_reconn_dns_cb>:
 }
 //TCP¡¨Ω”÷–DNS÷ÿ–¬≈‰÷√¡¨Ω”
 void ICACHE_FLASH_ATTR
 esp8266_reconn_dns_cb(void){
 	struct station_config *re_dsn;
 	os_timer_disarm(&tcp_reconn_timer);
-40244304:	fee521        	l32r	a2, 40243e98 <esp8266_tcp_sent_cb+0x4>
+40244300:	fee621        	l32r	a2, 40243e98 <esp8266_tcp_sent_cb+0x4>
 
     }
 }
 //TCP¡¨Ω”÷–DNS÷ÿ–¬≈‰÷√¡¨Ω”
 void ICACHE_FLASH_ATTR
 esp8266_reconn_dns_cb(void){
-40244307:	e0c112        	addi	a1, a1, -32
-4024430a:	076102        	s32i	a0, a1, 28
+40244303:	e0c112        	addi	a1, a1, -32
+40244306:	076102        	s32i	a0, a1, 28
 	struct station_config *re_dsn;
 	os_timer_disarm(&tcp_reconn_timer);
-4024430d:	f02a01        	l32r	a0, 402403b8 <user_uart_wait_tx_fifo_empty+0x144>
-40244310:	0000c0        	callx0	a0
+40244309:	f02b01        	l32r	a0, 402403b8 <user_uart_wait_tx_fifo_empty+0x144>
+4024430c:	0000c0        	callx0	a0
 	struct ip_info ipconfig;
 	wifi_get_ip_info(STATION_IF, &ipconfig);
-40244313:	203110        	or	a3, a1, a1
-40244316:	020c      	movi.n	a2, 0
-40244318:	fed685        	call0	40243084 <wifi_get_ip_info>
+4024430f:	203110        	or	a3, a1, a1
+40244312:	020c      	movi.n	a2, 0
+40244314:	fed6c5        	call0	40243084 <wifi_get_ip_info>
 
 	uint8_t wifi_reconn_state;
 		wifi_reconn_state=wifi_station_get_connect_status();
-4024431b:	fe0ec5        	call0	40242408 <wifi_station_get_connect_status>
+40244317:	fe0f05        	call0	40242408 <wifi_station_get_connect_status>
 	    if (wifi_reconn_state== STATION_GOT_IP)
-4024431e:	025266        	bnei	a2, 5, 40244324 <esp8266_reconn_dns_cb+0x20>
+4024431a:	025266        	bnei	a2, 5, 40244320 <esp8266_reconn_dns_cb+0x20>
 		{
 	    	//÷ÿ–¬∑÷≈‰Ω‚ŒˆDNS
 	    	connect_to_server_dns_init();
-40244321:	fffac5        	call0	402442d0 <connect_to_server_dns_init>
+4024431d:	fffac5        	call0	402442cc <connect_to_server_dns_init>
 		}else{
 			//uart0_sendStr("reconnect to tcp server\r\n");
 			//os_timer_setfn(&tcp_reconn_timer, (os_timer_func_t *)esp8266_reconn_dns_cb, NULL);
 			//os_timer_arm(&tcp_reconn_timer, 60000, 0);
 		}
 }
-40244324:	7108      	l32i.n	a0, a1, 28
-40244326:	20c112        	addi	a1, a1, 32
-40244329:	f00d      	ret.n
-4024432b:	f10400        	excw
-4024432e:	fe          	.byte 0xfe
+40244320:	7108      	l32i.n	a0, a1, 28
+40244322:	20c112        	addi	a1, a1, 32
+40244325:	f00d      	ret.n
+40244327:	f10400        	excw
+4024432a:	fe          	.byte 0xfe
+4024432b:	3f          	.byte 0x3f
+4024432c:	fef0f0        	excw
 4024432f:	3f          	.byte 0x3f
-40244330:	fef0f0        	excw
-40244333:	3f          	.byte 0x3f
 
-40244334 <smartconfig_done>:
-	//”√”⁄Ω” ’∂Àø⁄IPµÿ÷∑≈‰÷√–≈œ¢
-	espconn_regist_recvcb(&phone_udp_conn, udpdata_recv); // ◊¢≤·“ª∏ˆUDP ˝æ›∞¸Ω” ’ªÿµ˜
-	espconn_create(&phone_udp_conn);//Ω®¡¢ UDP ¥´ ‰
-}
+40244330 <smartconfig_done>:
+
+int udp_Current_Remote_Port;//UDP¡¨Ω”µƒ‘∂≥Ã∂Àø⁄
+uint8_t udp_Current_Remote_Ip[4] = {0};  //”√¿¥¥Ê∑≈œ÷‘⁄¡¨Ω”π˝¿¥µƒ‘∂∂ÀIP
+
 void ICACHE_FLASH_ATTR
 smartconfig_done(sc_status status, void *pdata){
-40244334:	d0c112        	addi	a1, a1, -48
-40244337:	b109      	s32i.n	a0, a1, 44
-40244339:	024d      	mov.n	a4, a2
+40244330:	d0c112        	addi	a1, a1, -48
+40244333:	b109      	s32i.n	a0, a1, 44
+40244335:	024d      	mov.n	a4, a2
     switch(status) {
-4024433b:	133226        	beqi	a2, 3, 40244352 <smartconfig_done+0x1e>
-4024433e:	244226        	beqi	a2, 4, 40244366 <smartconfig_done+0x32>
-40244341:	3d2266        	bnei	a2, 2, 40244382 <smartconfig_done+0x4e>
+40244337:	133226        	beqi	a2, 3, 4024434e <smartconfig_done+0x1e>
+4024433a:	244226        	beqi	a2, 4, 40244362 <smartconfig_done+0x32>
+4024433d:	3d2266        	bnei	a2, 2, 4024437e <smartconfig_done+0x4e>
         {
 #ifdef DEBUG_MODE
 	 	  		uart0_tx_buffer("smart_cf=getpss\n", 16);
 #endif
         	sc_type *type = pdata;
 			config_time = configtime;
-40244344:	fffa21        	l32r	a2, 4024432c <esp8266_reconn_dns_cb+0x28>
-40244347:	832c      	movi.n	a3, 40
-40244349:	004232        	s8i	a3, a2, 0
-4024434c:	000c86        	j	40244382 <smartconfig_done+0x4e>
-4024434f:	000000        	ill
+40244340:	fffa21        	l32r	a2, 40244328 <esp8266_reconn_dns_cb+0x28>
+40244343:	832c      	movi.n	a3, 40
+40244345:	004232        	s8i	a3, a2, 0
+40244348:	000c86        	j	4024437e <smartconfig_done+0x4e>
+4024434b:	000000        	ill
         case SC_STATUS_LINK:
         {
 #ifdef DEBUG_MODE
 	 	  		uart0_tx_buffer("smart_cf=link\n", 14);
 #endif
 		 	  	wifi_station_disconnect();
-40244352:	046132        	s32i	a3, a1, 16
-40244355:	fdff05        	call0	40242348 <wifi_station_disconnect>
+4024434e:	046132        	s32i	a3, a1, 16
+40244351:	fdff45        	call0	40242348 <wifi_station_disconnect>
 
 		        struct station_config *sta_conf = pdata;
 			    wifi_station_set_config(sta_conf);
-40244358:	4138      	l32i.n	a3, a1, 16
-4024435a:	032d      	mov.n	a2, a3
-4024435c:	fdd385        	call0	40242098 <wifi_station_set_config>
+40244354:	4138      	l32i.n	a3, a1, 16
+40244356:	032d      	mov.n	a2, a3
+40244358:	fdd3c5        	call0	40242098 <wifi_station_set_config>
 
 			    wifi_station_connect();
-4024435f:	fdf545        	call0	402422b4 <wifi_station_connect>
+4024435b:	fdf585        	call0	402422b4 <wifi_station_connect>
 
         }
             break;
-40244362:	000706        	j	40244382 <smartconfig_done+0x4e>
-40244365:	d31600        	excw
+4024435e:	000706        	j	4024437e <smartconfig_done+0x4e>
+40244361:	d31600        	excw
         case SC_STATUS_LINK_OVER:
             //uart0_sendStr("SC_STATUS_LINK_OVER\n");
             if (pdata != NULL)
-40244368:	a05200        	addx4	a5, a2, a0
+40244364:	a05200        	addx4	a5, a2, a0
             {
                 uint8 phone_ip[4] = {0};
-4024436b:	211000        	srai	a1, a0, 0
+40244367:	211000        	srai	a1, a0, 0
                 os_memcpy(phone_ip, (uint8*)pdata, 4);
-4024436e:	015920        	slli	a5, a9, 30
-40244371:	f00a01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-40244374:	0000c0        	callx0	a0
+4024436a:	015920        	slli	a5, a9, 30
+4024436d:	f00b01        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+40244370:	0000c0        	callx0	a0
 			}
 #ifdef DEBUG_MODE
 	 	  		uart0_tx_buffer("smart_cf=link_ok\n", 17);
 #endif
 
             smartconfig_stop();
-40244377:	24f8c5        	call0	40269304 <smartconfig_stop>
+40244373:	24f905        	call0	40269304 <smartconfig_stop>
             config_state = COMPLETE_CONFIG;
-4024437a:	ffed21        	l32r	a2, 40244330 <esp8266_reconn_dns_cb+0x2c>
-4024437d:	230c      	movi.n	a3, 2
-4024437f:	004232        	s8i	a3, a2, 0
+40244376:	ffed21        	l32r	a2, 4024432c <esp8266_reconn_dns_cb+0x2c>
+40244379:	230c      	movi.n	a3, 2
+4024437b:	004232        	s8i	a3, a2, 0
             break;
     }
 }
-40244382:	b108      	l32i.n	a0, a1, 44
-40244384:	30c112        	addi	a1, a1, 48
-40244387:	f00d      	ret.n
-40244389:	000000        	ill
-4024438c:	8418      	l32i.n	a1, a4, 32
+4024437e:	b108      	l32i.n	a0, a1, 44
+40244380:	30c112        	addi	a1, a1, 48
+40244383:	f00d      	ret.n
+40244385:	000000        	ill
+40244388:	fe8414        	excw
+4024438b:	3f          	.byte 0x3f
+4024438c:	f009      	s32i.n	a0, a0, 60
 4024438e:	fe          	.byte 0xfe
 4024438f:	3f          	.byte 0x3f
-40244390:	f009      	s32i.n	a0, a0, 60
-40244392:	fe          	.byte 0xfe
+40244390:	fef010        	excw
 40244393:	3f          	.byte 0x3f
-40244394:	fef010        	excw
+40244394:	fe8420        	excw
 40244397:	3f          	.byte 0x3f
-40244398:	fe8424        	excw
+40244398:	f008      	l32i.n	a0, a0, 60
+4024439a:	fe          	.byte 0xfe
 4024439b:	3f          	.byte 0x3f
-4024439c:	f008      	l32i.n	a0, a0, 60
+4024439c:	f0e8      	l32i.n	a14, a0, 60
 4024439e:	fe          	.byte 0xfe
 4024439f:	3f          	.byte 0x3f
-402443a0:	f0e8      	l32i.n	a14, a0, 60
-402443a2:	fe          	.byte 0xfe
-402443a3:	3f          	.byte 0x3f
-402443a4:	101320        	and	a1, a3, a2
-402443a7:	631c40        	excw
-402443aa:	124010        	excw
+402443a0:	101320        	and	a1, a3, a2
+402443a3:	631c40        	excw
+402443a6:	124010        	excw
 
-402443ac <udp_process_command>:
+402443a8 <udp_process_command>:
 
-int udp_Current_Remote_Port;//UDP¡¨Ω”µƒ‘∂≥Ã∂Àø⁄
-uint8_t udp_Current_Remote_Ip[4] = {0};  //”√¿¥¥Ê∑≈œ÷‘⁄¡¨Ω”π˝¿¥µƒ‘∂∂ÀIP
 
 void ICACHE_FLASH_ATTR
 udp_process_command(char *pdata, unsigned short len){
-402443ac:	b0c112        	addi	a1, a1, -80
-402443af:	f44030        	extui	a4, a3, 0, 16
+402443a8:	b0c112        	addi	a1, a1, -80
+402443ab:	f44030        	extui	a4, a3, 0, 16
 		char data_buf[64];
 		int i;
 		uint8_t ret=0;
 		uint8_t index = 0;
 		uint32 ret_port=0;
 		os_memcpy(data_buf,pdata,len);
-402443b2:	203220        	or	a3, a2, a2
-402443b5:	202110        	or	a2, a1, a1
+402443ae:	203220        	or	a3, a2, a2
+402443b1:	202110        	or	a2, a1, a1
+    }
+}
 
-int udp_Current_Remote_Port;//UDP¡¨Ω”µƒ‘∂≥Ã∂Àø⁄
-uint8_t udp_Current_Remote_Ip[4] = {0};  //”√¿¥¥Ê∑≈œ÷‘⁄¡¨Ω”π˝¿¥µƒ‘∂∂ÀIP
 
 void ICACHE_FLASH_ATTR
 udp_process_command(char *pdata, unsigned short len){
-402443b8:	136102        	s32i	a0, a1, 76
-402443bb:	1261c2        	s32i	a12, a1, 72
+402443b4:	136102        	s32i	a0, a1, 76
+402443b7:	1261c2        	s32i	a12, a1, 72
 		char data_buf[64];
 		int i;
 		uint8_t ret=0;
 		uint8_t index = 0;
 		uint32 ret_port=0;
 		os_memcpy(data_buf,pdata,len);
-402443be:	eff701        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-402443c1:	0000c0        	callx0	a0
+402443ba:	eff801        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+402443bd:	0000c0        	callx0	a0
 		if(!strncmp(data_buf,"SERVER IP:",strlen("SERVER IP:"))){
-402443c4:	fff231        	l32r	a3, 4024438c <smartconfig_done+0x58>
-402443c7:	012d      	mov.n	a2, a1
-402443c9:	a40c      	movi.n	a4, 10
-402443cb:	fff601        	l32r	a0, 402443a4 <smartconfig_done+0x70>
-402443ce:	0000c0        	callx0	a0
-402443d1:	05c256        	bnez	a2, 40244431 <udp_process_command+0x85>
+402443c0:	fff231        	l32r	a3, 40244388 <smartconfig_done+0x58>
+402443c3:	012d      	mov.n	a2, a1
+402443c5:	a40c      	movi.n	a4, 10
+402443c7:	fff601        	l32r	a0, 402443a0 <smartconfig_done+0x70>
+402443ca:	0000c0        	callx0	a0
+402443cd:	05c256        	bnez	a2, 4024442d <udp_process_command+0x85>
 			ipconfig_cnt=1;
-402443d4:	ffefc1        	l32r	a12, 40244390 <smartconfig_done+0x5c>
-402443d7:	140c      	movi.n	a4, 1
+402443d0:	ffefc1        	l32r	a12, 4024438c <smartconfig_done+0x5c>
+402443d3:	140c      	movi.n	a4, 1
 			for(i = 0; data_buf[i+10] != ':' && i < 15; i++){
-402443d9:	0a0132        	l8ui	a3, a1, 10
+402443d5:	0a0132        	l8ui	a3, a1, 10
 		uint8_t ret=0;
 		uint8_t index = 0;
 		uint32 ret_port=0;
 		os_memcpy(data_buf,pdata,len);
 		if(!strncmp(data_buf,"SERVER IP:",strlen("SERVER IP:"))){
 			ipconfig_cnt=1;
-402443dc:	004c42        	s8i	a4, a12, 0
+402443d8:	004c42        	s8i	a4, a12, 0
 			for(i = 0; data_buf[i+10] != ':' && i < 15; i++){
-402443df:	a63c      	movi.n	a6, 58
-402443e1:	0f9367        	bne	a3, a6, 402443f4 <udp_process_command+0x48>
+402443db:	a63c      	movi.n	a6, 58
+402443dd:	0f9367        	bne	a3, a6, 402443f0 <udp_process_command+0x48>
 				}else{
 					ret = 0;
 					index++;
 					}
 				}
 			memset(data_buf,0,sizeof(data_buf));
-402443e4:	012d      	mov.n	a2, a1
-402443e6:	030c      	movi.n	a3, 0
-402443e8:	044c      	movi.n	a4, 64
-402443ea:	ffef01        	l32r	a0, 402443a8 <smartconfig_done+0x74>
-402443ed:	0000c0        	callx0	a0
-402443f0:	003a46        	j	402444dd <udp_process_command+0x131>
-402443f3:	e88100        	excw
+402443e0:	012d      	mov.n	a2, a1
+402443e2:	030c      	movi.n	a3, 0
+402443e4:	044c      	movi.n	a4, 64
+402443e6:	ffef01        	l32r	a0, 402443a4 <smartconfig_done+0x74>
+402443e9:	0000c0        	callx0	a0
+402443ec:	003a46        	j	402444d9 <udp_process_command+0x131>
+402443ef:	e88100        	excw
 		if(!strncmp(data_buf,"SERVER IP:",strlen("SERVER IP:"))){
 			ipconfig_cnt=1;
 			for(i = 0; data_buf[i+10] != ':' && i < 15; i++){
 				if(data_buf[i+10] != '.'){
 				ret = ret*10 + data_buf[i+10] - '0';
 				set_server_ip[index] = ret;
-402443f6:	ff          	.byte 0xff
-402443f7:	51bb      	addi.n	a5, a1, 11
-402443f9:	1ac192        	addi	a9, a1, 26
+402443f2:	ff          	.byte 0xff
+402443f3:	51bb      	addi.n	a5, a1, 11
+402443f5:	1ac192        	addi	a9, a1, 26
 
 void ICACHE_FLASH_ATTR
 udp_process_command(char *pdata, unsigned short len){
 		char data_buf[64];
 		int i;
 		uint8_t ret=0;
-402443fc:	024d      	mov.n	a4, a2
+402443f8:	024d      	mov.n	a4, a2
 		uint32 ret_port=0;
 		os_memcpy(data_buf,pdata,len);
 		if(!strncmp(data_buf,"SERVER IP:",strlen("SERVER IP:"))){
 			ipconfig_cnt=1;
 			for(i = 0; data_buf[i+10] != ':' && i < 15; i++){
 				if(data_buf[i+10] != '.'){
-402443fe:	e72c      	movi.n	a7, 46
+402443fa:	e72c      	movi.n	a7, 46
 				ret = ret*10 + data_buf[i+10] - '0';
-40244400:	a04440        	addx4	a4, a4, a4
-40244403:	1144f0        	slli	a4, a4, 1
-40244406:	d0c442        	addi	a4, a4, -48
-40244409:	744040        	extui	a4, a4, 0, 8
-4024440c:	443a      	add.n	a4, a4, a3
-4024440e:	744040        	extui	a4, a4, 0, 8
+402443fc:	a04440        	addx4	a4, a4, a4
+402443ff:	1144f0        	slli	a4, a4, 1
+40244402:	d0c442        	addi	a4, a4, -48
+40244405:	744040        	extui	a4, a4, 0, 8
+40244408:	443a      	add.n	a4, a4, a3
+4024440a:	744040        	extui	a4, a4, 0, 8
 				set_server_ip[index] = ret;
-40244411:	a82a      	add.n	a10, a8, a2
+4024440d:	a82a      	add.n	a10, a8, a2
 		uint32 ret_port=0;
 		os_memcpy(data_buf,pdata,len);
 		if(!strncmp(data_buf,"SERVER IP:",strlen("SERVER IP:"))){
 			ipconfig_cnt=1;
 			for(i = 0; data_buf[i+10] != ':' && i < 15; i++){
 				if(data_buf[i+10] != '.'){
-40244413:	051377        	beq	a3, a7, 4024441c <udp_process_command+0x70>
+4024440f:	051377        	beq	a3, a7, 40244418 <udp_process_command+0x70>
 				ret = ret*10 + data_buf[i+10] - '0';
 				set_server_ip[index] = ret;
-40244416:	004a42        	s8i	a4, a10, 0
-40244419:	000186        	j	40244423 <udp_process_command+0x77>
+40244412:	004a42        	s8i	a4, a10, 0
+40244415:	000186        	j	4024441f <udp_process_command+0x77>
 				}else{
 					ret = 0;
 					index++;
-4024441c:	221b      	addi.n	a2, a2, 1
-4024441e:	742020        	extui	a2, a2, 0, 8
+40244418:	221b      	addi.n	a2, a2, 1
+4024441a:	742020        	extui	a2, a2, 0, 8
 			for(i = 0; data_buf[i+10] != ':' && i < 15; i++){
 				if(data_buf[i+10] != '.'){
 				ret = ret*10 + data_buf[i+10] - '0';
 				set_server_ip[index] = ret;
 				}else{
 					ret = 0;
-40244421:	040c      	movi.n	a4, 0
+4024441d:	040c      	movi.n	a4, 0
 		uint8_t index = 0;
 		uint32 ret_port=0;
 		os_memcpy(data_buf,pdata,len);
 		if(!strncmp(data_buf,"SERVER IP:",strlen("SERVER IP:"))){
 			ipconfig_cnt=1;
 			for(i = 0; data_buf[i+10] != ':' && i < 15; i++){
-40244423:	000532        	l8ui	a3, a5, 0
-40244426:	551b      	addi.n	a5, a5, 1
-40244428:	b81367        	beq	a3, a6, 402443e4 <udp_process_command+0x38>
-4024442b:	d19597        	bne	a5, a9, 40244400 <udp_process_command+0x54>
-4024442e:	ffec86        	j	402443e4 <udp_process_command+0x38>
+4024441f:	000532        	l8ui	a3, a5, 0
+40244422:	551b      	addi.n	a5, a5, 1
+40244424:	b81367        	beq	a3, a6, 402443e0 <udp_process_command+0x38>
+40244427:	d19597        	bne	a5, a9, 402443fc <udp_process_command+0x54>
+4024442a:	ffec86        	j	402443e0 <udp_process_command+0x38>
 					index++;
 					}
 				}
 			memset(data_buf,0,sizeof(data_buf));
 
 		}else if(!strncmp(data_buf,"SERVER PORT:",strlen("SERVER PORT:"))){
-40244431:	ffd931        	l32r	a3, 40244398 <smartconfig_done+0x64>
-40244434:	012d      	mov.n	a2, a1
-40244436:	c40c      	movi.n	a4, 12
-40244438:	ffdb01        	l32r	a0, 402443a4 <smartconfig_done+0x70>
-4024443b:	0000c0        	callx0	a0
-4024443e:	025d      	mov.n	a5, a2
-40244440:	090256        	bnez	a2, 402444d4 <udp_process_command+0x128>
+4024442d:	ffd931        	l32r	a3, 40244394 <smartconfig_done+0x64>
+40244430:	012d      	mov.n	a2, a1
+40244432:	c40c      	movi.n	a4, 12
+40244434:	ffdb01        	l32r	a0, 402443a0 <smartconfig_done+0x70>
+40244437:	0000c0        	callx0	a0
+4024443a:	025d      	mov.n	a5, a2
+4024443c:	090256        	bnez	a2, 402444d0 <udp_process_command+0x128>
 			portconfig_cnt=1;
-40244443:	ffd621        	l32r	a2, 4024439c <smartconfig_done+0x68>
-40244446:	130c      	movi.n	a3, 1
+4024443f:	ffd621        	l32r	a2, 40244398 <smartconfig_done+0x68>
+40244442:	130c      	movi.n	a3, 1
 			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
-40244448:	0c0142        	l8ui	a4, a1, 12
+40244444:	0c0142        	l8ui	a4, a1, 12
 					}
 				}
 			memset(data_buf,0,sizeof(data_buf));
 
 		}else if(!strncmp(data_buf,"SERVER PORT:",strlen("SERVER PORT:"))){
 			portconfig_cnt=1;
-4024444b:	004232        	s8i	a3, a2, 0
+40244447:	004232        	s8i	a3, a2, 0
 			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
-4024444e:	a73c      	movi.n	a7, 58
-40244450:	621477        	beq	a4, a7, 402444b6 <udp_process_command+0x10a>
+4024444a:	a73c      	movi.n	a7, 58
+4024444c:	621477        	beq	a4, a7, 402444b2 <udp_process_command+0x10a>
 udp_process_command(char *pdata, unsigned short len){
 		char data_buf[64];
 		int i;
 		uint8_t ret=0;
 		uint8_t index = 0;
 		uint32 ret_port=0;
-40244453:	052d      	mov.n	a2, a5
-40244455:	31db      	addi.n	a3, a1, 13
-40244457:	12c162        	addi	a6, a1, 18
+4024444f:	052d      	mov.n	a2, a5
+40244451:	31db      	addi.n	a3, a1, 13
+40244453:	12c162        	addi	a6, a1, 18
 				}
 			memset(data_buf,0,sizeof(data_buf));
 
 		}else if(!strncmp(data_buf,"SERVER PORT:",strlen("SERVER PORT:"))){
 			portconfig_cnt=1;
 			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
-4024445a:	075d      	mov.n	a5, a7
+40244456:	075d      	mov.n	a5, a7
 				{
 				ret_port = ret_port*10 + data_buf[i+12] - '0';
-4024445c:	a02220        	addx4	a2, a2, a2
-4024445f:	902240        	addx2	a2, a2, a4
+40244458:	a02220        	addx4	a2, a2, a2
+4024445b:	902240        	addx2	a2, a2, a4
 				}
 			memset(data_buf,0,sizeof(data_buf));
 
 		}else if(!strncmp(data_buf,"SERVER PORT:",strlen("SERVER PORT:"))){
 			portconfig_cnt=1;
 			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
-40244462:	000342        	l8ui	a4, a3, 0
+4024445e:	000342        	l8ui	a4, a3, 0
 				{
 				ret_port = ret_port*10 + data_buf[i+12] - '0';
-40244465:	d0c222        	addi	a2, a2, -48
-40244468:	331b      	addi.n	a3, a3, 1
+40244461:	d0c222        	addi	a2, a2, -48
+40244464:	331b      	addi.n	a3, a3, 1
 				}
 			memset(data_buf,0,sizeof(data_buf));
 
 		}else if(!strncmp(data_buf,"SERVER PORT:",strlen("SERVER PORT:"))){
 			portconfig_cnt=1;
 			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
-4024446a:	229457        	bne	a4, a5, 40244490 <udp_process_command+0xe4>
-4024446d:	025d      	mov.n	a5, a2
-4024446f:	312f20        	srai	a2, a2, 31
-40244472:	752820        	extui	a2, a2, 24, 8
-40244475:	352a      	add.n	a3, a5, a2
-40244477:	ffa092        	movi	a9, 255
-4024447a:	959a      	add.n	a9, a5, a9
-4024447c:	743030        	extui	a3, a3, 0, 8
-4024447f:	b39550        	movgez	a9, a5, a5
-40244482:	c02320        	sub	a2, a3, a2
-40244485:	749890        	extui	a9, a9, 8, 8
-40244488:	748020        	extui	a8, a2, 0, 8
-4024448b:	000ac6        	j	402444ba <udp_process_command+0x10e>
-4024448e:	670000        	excw
-40244491:	5dc893        	excw
-40244494:	2f2002        	l32i	a0, a0, 188
-40244497:	282031        	l32r	a3, 4020e518 <_lit4_end+0x107f50>
-4024449a:	852a75        	excw
-4024449d:	ffa092        	movi	a9, 255
-402444a0:	748080        	extui	a8, a8, 0, 8
-402444a3:	959a      	add.n	a9, a5, a9
-402444a5:	b39550        	movgez	a9, a5, a5
-402444a8:	c02820        	sub	a2, a8, a2
-402444ab:	749890        	extui	a9, a9, 8, 8
-402444ae:	748020        	extui	a8, a2, 0, 8
-402444b1:	000146        	j	402444ba <udp_process_command+0x10e>
-402444b4:	8d0000        	excw
-402444b7:	059d05        	call0	40249e88 <register_chipv6_phy+0x208>
+40244466:	229457        	bne	a4, a5, 4024448c <udp_process_command+0xe4>
+40244469:	025d      	mov.n	a5, a2
+4024446b:	312f20        	srai	a2, a2, 31
+4024446e:	752820        	extui	a2, a2, 24, 8
+40244471:	352a      	add.n	a3, a5, a2
+40244473:	ffa092        	movi	a9, 255
+40244476:	959a      	add.n	a9, a5, a9
+40244478:	743030        	extui	a3, a3, 0, 8
+4024447b:	b39550        	movgez	a9, a5, a5
+4024447e:	c02320        	sub	a2, a3, a2
+40244481:	749890        	extui	a9, a9, 8, 8
+40244484:	748020        	extui	a8, a2, 0, 8
+40244487:	000ac6        	j	402444b6 <udp_process_command+0x10e>
+4024448a:	670000        	excw
+4024448d:	5dc893        	excw
+40244490:	2f2002        	l32i	a0, a0, 188
+40244493:	282031        	l32r	a3, 4020e514 <_lit4_end+0x107f4c>
+40244496:	852a75        	excw
+40244499:	ffa092        	movi	a9, 255
+4024449c:	748080        	extui	a8, a8, 0, 8
+4024449f:	959a      	add.n	a9, a5, a9
+402444a1:	b39550        	movgez	a9, a5, a5
+402444a4:	c02820        	sub	a2, a8, a2
+402444a7:	749890        	extui	a9, a9, 8, 8
+402444aa:	748020        	extui	a8, a2, 0, 8
+402444ad:	000146        	j	402444b6 <udp_process_command+0x10e>
+402444b0:	8d0000        	excw
+402444b3:	059d05        	call0	40249e84 <register_chipv6_phy+0x204>
 				{
 				ret_port = ret_port*10 + data_buf[i+12] - '0';
 				}
 
 			current_set_Port=ret_port;
 			set_server_ip[4] = current_set_Port/256;
-402444ba:	ffb661        	l32r	a6, 40244394 <smartconfig_done+0x60>
+402444b6:	ffb661        	l32r	a6, 40244390 <smartconfig_done+0x60>
 			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
 				{
 				ret_port = ret_port*10 + data_buf[i+12] - '0';
 				}
 
 			current_set_Port=ret_port;
-402444bd:	ffb871        	l32r	a7, 402443a0 <smartconfig_done+0x6c>
+402444b9:	ffb871        	l32r	a7, 4024439c <smartconfig_done+0x6c>
 			set_server_ip[4] = current_set_Port/256;
 			set_server_ip[5] = current_set_Port%256;
 			memset(data_buf,0,sizeof(data_buf));
-402444c0:	012d      	mov.n	a2, a1
-402444c2:	030c      	movi.n	a3, 0
-402444c4:	044c      	movi.n	a4, 64
+402444bc:	012d      	mov.n	a2, a1
+402444be:	030c      	movi.n	a3, 0
+402444c0:	044c      	movi.n	a4, 64
 			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
 				{
 				ret_port = ret_port*10 + data_buf[i+12] - '0';
 				}
 
 			current_set_Port=ret_port;
-402444c6:	0759      	s32i.n	a5, a7, 0
+402444c2:	0759      	s32i.n	a5, a7, 0
 			set_server_ip[4] = current_set_Port/256;
-402444c8:	044692        	s8i	a9, a6, 4
+402444c4:	044692        	s8i	a9, a6, 4
 			set_server_ip[5] = current_set_Port%256;
-402444cb:	054682        	s8i	a8, a6, 5
+402444c7:	054682        	s8i	a8, a6, 5
 			memset(data_buf,0,sizeof(data_buf));
-402444ce:	ffb601        	l32r	a0, 402443a8 <smartconfig_done+0x74>
-402444d1:	0000c0        	callx0	a0
-402444d4:	ffafc1        	l32r	a12, 40244390 <smartconfig_done+0x5c>
-402444d7:	000c22        	l8ui	a2, a12, 0
+402444ca:	ffb601        	l32r	a0, 402443a4 <smartconfig_done+0x74>
+402444cd:	0000c0        	callx0	a0
+402444d0:	ffafc1        	l32r	a12, 4024438c <smartconfig_done+0x5c>
+402444d3:	000c22        	l8ui	a2, a12, 0
 		}
 		if((ipconfig_cnt==1) && (portconfig_cnt==1)){
-402444da:	2a1266        	bnei	a2, 1, 40244508 <udp_process_command+0x15c>
-402444dd:	ffaf31        	l32r	a3, 4024439c <smartconfig_done+0x68>
-402444e0:	000322        	l8ui	a2, a3, 0
-402444e3:	211266        	bnei	a2, 1, 40244508 <udp_process_command+0x15c>
+402444d6:	2a1266        	bnei	a2, 1, 40244504 <udp_process_command+0x15c>
+402444d9:	ffaf31        	l32r	a3, 40244398 <smartconfig_done+0x68>
+402444dc:	000322        	l8ui	a2, a3, 0
+402444df:	211266        	bnei	a2, 1, 40244504 <udp_process_command+0x15c>
 			ipconfig_cnt=0;
-402444e6:	040c      	movi.n	a4, 0
+402444e2:	040c      	movi.n	a4, 0
 			portconfig_cnt=0;
 			spi_flash_erase_sector(0x3C);
-402444e8:	3ca022        	movi	a2, 60
+402444e4:	3ca022        	movi	a2, 60
 			set_server_ip[5] = current_set_Port%256;
 			memset(data_buf,0,sizeof(data_buf));
 		}
 		if((ipconfig_cnt==1) && (portconfig_cnt==1)){
 			ipconfig_cnt=0;
 			portconfig_cnt=0;
-402444eb:	004342        	s8i	a4, a3, 0
+402444e7:	004342        	s8i	a4, a3, 0
 			set_server_ip[4] = current_set_Port/256;
 			set_server_ip[5] = current_set_Port%256;
 			memset(data_buf,0,sizeof(data_buf));
 		}
 		if((ipconfig_cnt==1) && (portconfig_cnt==1)){
 			ipconfig_cnt=0;
-402444ee:	004c42        	s8i	a4, a12, 0
+402444ea:	004c42        	s8i	a4, a12, 0
 			portconfig_cnt=0;
 			spi_flash_erase_sector(0x3C);
-402444f1:	f56001        	l32r	a0, 40241a74 <system_get_checksum+0x34>
-402444f4:	0000c0        	callx0	a0
+402444ed:	f56101        	l32r	a0, 40241a74 <system_get_checksum+0x34>
+402444f0:	0000c0        	callx0	a0
 			spi_flash_write(0x3C * 4096, (uint32 *)set_server_ip, 6);
-402444f7:	ffa731        	l32r	a3, 40244394 <smartconfig_done+0x60>
-402444fa:	ff4a21        	l32r	a2, 40244224 <connect_to_server_init+0x5c>
-402444fd:	640c      	movi.n	a4, 6
-402444ff:	f55e01        	l32r	a0, 40241a78 <system_get_checksum+0x38>
-40244502:	0000c0        	callx0	a0
+402444f3:	ffa731        	l32r	a3, 40244390 <smartconfig_done+0x60>
+402444f6:	ff4a21        	l32r	a2, 40244220 <connect_to_server_init+0x5c>
+402444f9:	640c      	movi.n	a4, 6
+402444fb:	f55f01        	l32r	a0, 40241a78 <system_get_checksum+0x38>
+402444fe:	0000c0        	callx0	a0
 	uart0_tx_buffer("/r/n", 2);
 	uart0_tx_buffer("/r/n", 2);
 	uart0_tx_buffer("/r/n", 2);
 	uart0_tx_buffer(set_server_ip, 6);
 #endif
 			system_restart();
-40244505:	fc75c5        	call0	40240c64 <system_restart>
+40244501:	fc7605        	call0	40240c64 <system_restart>
+			  config_state = NO_CONFIG;
+			  config_time = configtime;
 		}
+		memset(data_buf,0,sizeof(data_buf));
+#endif
 }
-40244508:	132102        	l32i	a0, a1, 76
-4024450b:	1221c2        	l32i	a12, a1, 72
-4024450e:	50c112        	addi	a1, a1, 80
-40244511:	f00d      	ret.n
-40244513:	f0ec00        	subx8	a14, a12, a0
-40244516:	fe          	.byte 0xfe
+40244504:	132102        	l32i	a0, a1, 76
+40244507:	1221c2        	l32i	a12, a1, 72
+4024450a:	50c112        	addi	a1, a1, 80
+4024450d:	f00d      	ret.n
+4024450f:	f0ec00        	subx8	a14, a12, a0
+40244512:	fe          	.byte 0xfe
+40244513:	3f          	.byte 0x3f
+40244514:	fef004        	excw
 40244517:	3f          	.byte 0x3f
-40244518:	fef004        	excw
-4024451b:	3f          	.byte 0x3f
 
-4024451c <udpdata_recv>:
+40244518 <udpdata_recv>:
 void ICACHE_FLASH_ATTR
 udpdata_recv(void *arg, char *pdata, unsigned short len){
-4024451c:	f0c112        	addi	a1, a1, -16
-4024451f:	3109      	s32i.n	a0, a1, 12
-40244521:	21c9      	s32i.n	a12, a1, 8
-40244523:	11d9      	s32i.n	a13, a1, 4
+40244518:	f0c112        	addi	a1, a1, -16
+4024451b:	3109      	s32i.n	a0, a1, 12
+4024451d:	21c9      	s32i.n	a12, a1, 8
+4024451f:	11d9      	s32i.n	a13, a1, 4
 	struct espconn *pespconnte = (struct espconn *)arg;
 
 	//ªÒ»°‘∂≥Ã¡¨Ω”µƒUDPµƒ∂Àø⁄∫ÕIPµÿ÷∑,“≤æÕ «≈‰÷√ ÷ª˙µƒ∂Àø⁄∫ÕIPµÿ÷∑
 	udp_Current_Remote_Port =  pespconnte->proto.udp->remote_port;
-40244525:	2258      	l32i.n	a5, a2, 8
-#endif
-			system_restart();
+40244521:	2258      	l32i.n	a5, a2, 8
 		}
+		memset(data_buf,0,sizeof(data_buf));
+#endif
 }
 void ICACHE_FLASH_ATTR
 udpdata_recv(void *arg, char *pdata, unsigned short len){
-40244527:	03dd      	mov.n	a13, a3
+40244523:	03dd      	mov.n	a13, a3
 	struct espconn *pespconnte = (struct espconn *)arg;
 
 	//ªÒ»°‘∂≥Ã¡¨Ω”µƒUDPµƒ∂Àø⁄∫ÕIPµÿ÷∑,“≤æÕ «≈‰÷√ ÷ª˙µƒ∂Àø⁄∫ÕIPµÿ÷∑
 	udp_Current_Remote_Port =  pespconnte->proto.udp->remote_port;
-40244529:	0568      	l32i.n	a6, a5, 0
+40244525:	0568      	l32i.n	a6, a5, 0
 	os_memcpy(udp_Current_Remote_Ip,pespconnte->proto.udp->remote_ip,4);
-4024452b:	35cb      	addi.n	a3, a5, 12
-4024452d:	fffa21        	l32r	a2, 40244518 <udp_process_command+0x16c>
+40244527:	35cb      	addi.n	a3, a5, 12
+40244529:	fffa21        	l32r	a2, 40244514 <udp_process_command+0x16c>
 void ICACHE_FLASH_ATTR
 udpdata_recv(void *arg, char *pdata, unsigned short len){
 	struct espconn *pespconnte = (struct espconn *)arg;
 
 	//ªÒ»°‘∂≥Ã¡¨Ω”µƒUDPµƒ∂Àø⁄∫ÕIPµÿ÷∑,“≤æÕ «≈‰÷√ ÷ª˙µƒ∂Àø⁄∫ÕIPµÿ÷∑
 	udp_Current_Remote_Port =  pespconnte->proto.udp->remote_port;
-40244530:	fff951        	l32r	a5, 40244514 <udp_process_command+0x168>
-#endif
-			system_restart();
+4024452c:	fff951        	l32r	a5, 40244510 <udp_process_command+0x168>
 		}
+		memset(data_buf,0,sizeof(data_buf));
+#endif
 }
 void ICACHE_FLASH_ATTR
 udpdata_recv(void *arg, char *pdata, unsigned short len){
-40244533:	f4c040        	extui	a12, a4, 0, 16
+4024452f:	f4c040        	extui	a12, a4, 0, 16
 	struct espconn *pespconnte = (struct espconn *)arg;
 
 	//ªÒ»°‘∂≥Ã¡¨Ω”µƒUDPµƒ∂Àø⁄∫ÕIPµÿ÷∑,“≤æÕ «≈‰÷√ ÷ª˙µƒ∂Àø⁄∫ÕIPµÿ÷∑
 	udp_Current_Remote_Port =  pespconnte->proto.udp->remote_port;
 	os_memcpy(udp_Current_Remote_Ip,pespconnte->proto.udp->remote_ip,4);
-40244536:	440c      	movi.n	a4, 4
+40244532:	440c      	movi.n	a4, 4
 void ICACHE_FLASH_ATTR
 udpdata_recv(void *arg, char *pdata, unsigned short len){
 	struct espconn *pespconnte = (struct espconn *)arg;
 
 	//ªÒ»°‘∂≥Ã¡¨Ω”µƒUDPµƒ∂Àø⁄∫ÕIPµÿ÷∑,“≤æÕ «≈‰÷√ ÷ª˙µƒ∂Àø⁄∫ÕIPµÿ÷∑
 	udp_Current_Remote_Port =  pespconnte->proto.udp->remote_port;
-40244538:	006562        	s32i	a6, a5, 0
+40244534:	006562        	s32i	a6, a5, 0
 	os_memcpy(udp_Current_Remote_Ip,pespconnte->proto.udp->remote_ip,4);
-4024453b:	ef9801        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
-4024453e:	0000c0        	callx0	a0
+40244537:	ef9901        	l32r	a0, 4024039c <user_uart_wait_tx_fifo_empty+0x128>
+4024453a:	0000c0        	callx0	a0
 
 	udp_process_command(pdata,len);
-40244541:	0d2d      	mov.n	a2, a13
-40244543:	0c3d      	mov.n	a3, a12
-40244545:	ffe645        	call0	402443ac <udp_process_command>
+4024453d:	0d2d      	mov.n	a2, a13
+4024453f:	0c3d      	mov.n	a3, a12
+40244541:	ffe645        	call0	402443a8 <udp_process_command>
 }
-40244548:	3108      	l32i.n	a0, a1, 12
-4024454a:	21c8      	l32i.n	a12, a1, 8
-4024454c:	11d8      	l32i.n	a13, a1, 4
-4024454e:	10c112        	addi	a1, a1, 16
-40244551:	f00d      	ret.n
-40244553:	839800        	moveqz	a9, a8, a0
+40244544:	3108      	l32i.n	a0, a1, 12
+40244546:	21c8      	l32i.n	a12, a1, 8
+40244548:	11d8      	l32i.n	a13, a1, 4
+4024454a:	10c112        	addi	a1, a1, 16
+4024454d:	f00d      	ret.n
+4024454f:	839800        	moveqz	a9, a8, a0
+40244552:	fe          	.byte 0xfe
+40244553:	3f          	.byte 0x3f
+40244554:	f0cc      	bnez.n	a0, 40244567 <udpdata_connect+0x3>
 40244556:	fe          	.byte 0xfe
 40244557:	3f          	.byte 0x3f
-40244558:	f0cc      	bnez.n	a0, 4024456b <udpdata_connect+0x3>
-4024455a:	fe          	.byte 0xfe
+40244558:	fef0f4        	excw
 4024455b:	3f          	.byte 0x3f
-4024455c:	fef0f4        	excw
+4024455c:	fef100        	excw
 4024455f:	3f          	.byte 0x3f
-40244560:	fef100        	excw
-40244563:	3f          	.byte 0x3f
-40244564:	451c      	movi.n	a5, 20
-40244566:	214024        	excw
+40244560:	4518      	l32i.n	a1, a5, 16
+40244562:	314024        	excw
 
-40244568 <udpdata_connect>:
+40244564 <udpdata_connect>:
 
 void ICACHE_FLASH_ATTR
 udpdata_connect(void){
 	uint8 udp_ip_remote[4]={255,255,255,255};
-40244568:	fffb21        	l32r	a2, 40244554 <udpdata_recv+0x38>
+40244564:	fffb31        	l32r	a3, 40244550 <udpdata_recv+0x38>
 
 	udp_process_command(pdata,len);
 }
 
 void ICACHE_FLASH_ATTR
 udpdata_connect(void){
-4024456b:	e0c112        	addi	a1, a1, -32
+40244567:	e0c112        	addi	a1, a1, -32
 	uint8 udp_ip_remote[4]={255,255,255,255};
-4024456e:	030272        	l8ui	a7, a2, 3
+4024456a:	000362        	l8ui	a6, a3, 0
+4024456d:	010352        	l8ui	a5, a3, 1
+40244570:	020342        	l8ui	a4, a3, 2
+40244573:	030332        	l8ui	a3, a3, 3
+	wifi_set_broadcast_if(0x01);//…Ë÷√udpπ„≤•¥”station ∑¢≥ˆ
+40244576:	120c      	movi.n	a2, 1
 
 	udp_process_command(pdata,len);
 }
 
 void ICACHE_FLASH_ATTR
 udpdata_connect(void){
-40244571:	61c9      	s32i.n	a12, a1, 24
+40244578:	7109      	s32i.n	a0, a1, 28
+4024457a:	61c9      	s32i.n	a12, a1, 24
 	uint8 udp_ip_remote[4]={255,255,255,255};
+4024457c:	004162        	s8i	a6, a1, 0
+4024457f:	014152        	s8i	a5, a1, 1
+40244582:	024142        	s8i	a4, a1, 2
+40244585:	034132        	s8i	a3, a1, 3
+	wifi_set_broadcast_if(0x01);//…Ë÷√udpπ„≤•¥”station ∑¢≥ˆ
+40244588:	fd37c5        	call0	40241908 <wifi_set_broadcast_if>
 	phone_udp_conn.type = ESPCONN_UDP;
 	phone_udp_conn.proto.udp = &phone_udp;
-40244573:	fffa51        	l32r	a5, 4024455c <udpdata_recv+0x40>
-}
+4024458b:	fff351        	l32r	a5, 40244558 <udpdata_recv+0x40>
 
 void ICACHE_FLASH_ATTR
 udpdata_connect(void){
 	uint8 udp_ip_remote[4]={255,255,255,255};
+	wifi_set_broadcast_if(0x01);//…Ë÷√udpπ„≤•¥”station ∑¢≥ˆ
 	phone_udp_conn.type = ESPCONN_UDP;
-40244576:	fff8c1        	l32r	a12, 40244558 <udpdata_recv+0x3c>
-	udp_process_command(pdata,len);
-}
-
-void ICACHE_FLASH_ATTR
-udpdata_connect(void){
-	uint8 udp_ip_remote[4]={255,255,255,255};
-40244579:	0002a2        	l8ui	a10, a2, 0
-4024457c:	010292        	l8ui	a9, a2, 1
-4024457f:	020282        	l8ui	a8, a2, 2
+4024458e:	fff1c1        	l32r	a12, 40244554 <udpdata_recv+0x3c>
 	phone_udp_conn.proto.udp = &phone_udp;
 	phone_udp_conn.proto.udp->local_port = 2002;//±æµÿ∂Àø⁄
 	phone_udp_conn.proto.udp->remote_port = 2002;//‘∂≥Ã∂Àø⁄
 
 	//os_memcpy(phone_udp_conn.proto.udp->local_ip,udp_ip_local,4);
 	os_memcpy(phone_udp_conn.proto.udp->remote_ip,udp_ip_remote,4);
-40244582:	fff721        	l32r	a2, 40244560 <udpdata_recv+0x44>
-
-	udp_process_command(pdata,len);
-}
-
-void ICACHE_FLASH_ATTR
+40244591:	fff221        	l32r	a2, 4024455c <udpdata_recv+0x44>
 udpdata_connect(void){
-40244585:	7109      	s32i.n	a0, a1, 28
 	uint8 udp_ip_remote[4]={255,255,255,255};
+	wifi_set_broadcast_if(0x01);//…Ë÷√udpπ„≤•¥”station ∑¢≥ˆ
 	phone_udp_conn.type = ESPCONN_UDP;
 	phone_udp_conn.proto.udp = &phone_udp;
 	phone_udp_conn.proto.udp->local_port = 2002;//±æµÿ∂Àø⁄
-40244587:	d2a762        	movi	a6, 0x7d2
+40244594:	d2a762        	movi	a6, 0x7d2
+
+void ICACHE_FLASH_ATTR
+udpdata_connect(void){
+	uint8 udp_ip_remote[4]={255,255,255,255};
+	wifi_set_broadcast_if(0x01);//…Ë÷√udpπ„≤•¥”station ∑¢≥ˆ
+	phone_udp_conn.type = ESPCONN_UDP;
+40244597:	072c      	movi.n	a7, 32
+	phone_udp_conn.proto.udp = &phone_udp;
+	phone_udp_conn.proto.udp->local_port = 2002;//±æµÿ∂Àø⁄
 	phone_udp_conn.proto.udp->remote_port = 2002;//‘∂≥Ã∂Àø⁄
 
 	//os_memcpy(phone_udp_conn.proto.udp->local_ip,udp_ip_local,4);
 	os_memcpy(phone_udp_conn.proto.udp->remote_ip,udp_ip_remote,4);
-4024458a:	013d      	mov.n	a3, a1
-4024458c:	440c      	movi.n	a4, 4
-	udp_process_command(pdata,len);
-}
+40244599:	013d      	mov.n	a3, a1
+4024459b:	440c      	movi.n	a4, 4
 
 void ICACHE_FLASH_ATTR
 udpdata_connect(void){
 	uint8 udp_ip_remote[4]={255,255,255,255};
-4024458e:	034172        	s8i	a7, a1, 3
+	wifi_set_broadcast_if(0x01);//…Ë÷√udpπ„≤•¥”station ∑¢≥ˆ
 	phone_udp_conn.type = ESPCONN_UDP;
-40244591:	072c      	movi.n	a7, 32
-	udp_process_command(pdata,len);
-}
-
-void ICACHE_FLASH_ATTR
-udpdata_connect(void){
-	uint8 udp_ip_remote[4]={255,255,255,255};
-40244593:	0041a2        	s8i	a10, a1, 0
-40244596:	014192        	s8i	a9, a1, 1
-40244599:	024182        	s8i	a8, a1, 2
-	phone_udp_conn.type = ESPCONN_UDP;
-4024459c:	0c79      	s32i.n	a7, a12, 0
+4024459d:	0c79      	s32i.n	a7, a12, 0
 	phone_udp_conn.proto.udp = &phone_udp;
-4024459e:	2c59      	s32i.n	a5, a12, 8
+4024459f:	2c59      	s32i.n	a5, a12, 8
 	phone_udp_conn.proto.udp->local_port = 2002;//±æµÿ∂Àø⁄
-402445a0:	1569      	s32i.n	a6, a5, 4
+402445a1:	1569      	s32i.n	a6, a5, 4
 	phone_udp_conn.proto.udp->remote_port = 2002;//‘∂≥Ã∂Àø⁄
-402445a2:	006562        	s32i	a6, a5, 0
+402445a3:	0569      	s32i.n	a6, a5, 0
 
 	//os_memcpy(phone_udp_conn.proto.udp->local_ip,udp_ip_local,4);
 	os_memcpy(phone_udp_conn.proto.udp->remote_ip,udp_ip_remote,4);
@@ -18844,9 +18839,10 @@ udpdata_connect(void){
 402445a8:	0000c0        	callx0	a0
 	//”√”⁄Ω” ’∂Àø⁄IPµÿ÷∑≈‰÷√–≈œ¢
 	espconn_regist_recvcb(&phone_udp_conn, udpdata_recv); // ◊¢≤·“ª∏ˆUDP ˝æ›∞¸Ω” ’ªÿµ˜
-402445ab:	ffee31        	l32r	a3, 40244564 <udpdata_recv+0x48>
+402445ab:	ffed31        	l32r	a3, 40244560 <udpdata_recv+0x48>
 402445ae:	0c2d      	mov.n	a2, a12
 402445b0:	18adc5        	call0	4025d090 <espconn_regist_recvcb>
+	//espconn_regist_sentcb(&phone_udp_conn, udpdata_send);//∑¢ÀÕªÿµ˜∫Ø ˝
 	espconn_create(&phone_udp_conn);//Ω®¡¢ UDP ¥´ ‰
 402445b3:	0c2d      	mov.n	a2, a12
 402445b5:	188385        	call0	4025cdf0 <espconn_create>
@@ -18861,7 +18857,7 @@ udpdata_connect(void){
 402445c7:	3f          	.byte 0x3f
 402445c8:	fef105        	call0	402434dc <divide+0x20>
 402445cb:	3f          	.byte 0x3f
-402445cc:	244334        	excw
+402445cc:	244330        	extui	a4, a3, 3, 3
 402445cf:	f04040        	subx8	a4, a0, a4
 402445d2:	fe          	.byte 0xfe
 402445d3:	3f          	.byte 0x3f
@@ -18869,10 +18865,7 @@ udpdata_connect(void){
 402445d7:	c11240        	mul16u	a1, a2, a4
 
 402445d8 <state_check>:
-            config_state = COMPLETE_CONFIG;
-            break;
-    }
-}
+
 
 void ICACHE_FLASH_ATTR state_check(void){
 402445d8:	f0c112        	addi	a1, a1, -16
@@ -18886,7 +18879,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 402445e6:	fde205        	call0	40242408 <wifi_station_get_connect_status>
 	  switch(wifi_conn_state)
 402445e9:	0b62f6        	bgeui	a2, 6, 402445f8 <state_check+0x20>
-402445ec:	fff631        	l32r	a3, 402445c4 <udpdata_connect+0x5c>
+402445ec:	fff631        	l32r	a3, 402445c4 <udpdata_connect+0x60>
 402445ef:	a02230        	addx4	a2, a2, a3
 402445f2:	0228      	l32i.n	a2, a2, 0
 402445f4:	0002a0        	jx	a2
@@ -18904,7 +18897,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 	 	  {
 	 	  	  case 0:
 	 	  		esp8266_state=2;
-40244601:	fff1c1        	l32r	a12, 402445c8 <udpdata_connect+0x60>
+40244601:	fff1c1        	l32r	a12, 402445c8 <udpdata_connect+0x64>
 	 	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFIƒ£øÈŒ¥≈‰÷√
 40244604:	030c      	movi.n	a3, 0
 
@@ -18939,7 +18932,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 	 	  		  break;
 	 	  	  case STATION_WRONG_PASSWORD:
 	 	  		  if(esp8266_state!=2){
-40244618:	ffecc1        	l32r	a12, 402445c8 <udpdata_connect+0x60>
+40244618:	ffecc1        	l32r	a12, 402445c8 <udpdata_connect+0x64>
 4024461b:	000c22        	l8ui	a2, a12, 0
 4024461e:	072226        	beqi	a2, 2, 40244629 <state_check+0x51>
 	 	  			  esp8266_state=2;
@@ -18979,7 +18972,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 4024464d:	0000c0        	callx0	a0
 	 	  		esp8266_state=3;
 	 	  		config_state=COMPLETE_TIMEOUT;
-40244650:	ff38e1        	l32r	a14, 40244330 <esp8266_reconn_dns_cb+0x2c>
+40244650:	ff37e1        	l32r	a14, 4024432c <esp8266_reconn_dns_cb+0x2c>
 	 	  		  }
 #ifdef DEBUG_MODE
 	 	  		uart0_tx_buffer("wifi_stat=noap_fd\n", 18);
@@ -19021,12 +19014,12 @@ void ICACHE_FLASH_ATTR state_check(void){
 	 	  	  case STATION_GOT_IP:
 	 	  	  {
 	 	  		  if(esp8266_state!=5){
-40244687:	ffd0c1        	l32r	a12, 402445c8 <udpdata_connect+0x60>
+40244687:	ffd0c1        	l32r	a12, 402445c8 <udpdata_connect+0x64>
 4024468a:	000c22        	l8ui	a2, a12, 0
 4024468d:	045226        	beqi	a2, 5, 40244695 <state_check+0xbd>
 	 				#ifdef DNS_ENABLE
 	 				#else
-	 		  			udpdata_connect();
+	 		  			//udpdata_connect();
 	 				#endif
 	 	  			esp8266_state=5;
 40244690:	520c      	movi.n	a2, 5
@@ -19045,7 +19038,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 	 	  		uart0_tx_buffer("wifi_stat=got_ip\n", 17);
 #endif
 	 	  		config_state=COMPLETE_CONFIG;
-4024469a:	ff25e1        	l32r	a14, 40244330 <esp8266_reconn_dns_cb+0x2c>
+4024469a:	ff24e1        	l32r	a14, 4024432c <esp8266_reconn_dns_cb+0x2c>
 	 	  		GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 0);//WIFIƒ£øÈªÒ»°µΩIP≤¢«“¡¨Ω”≥…π¶
 4024469d:	025d      	mov.n	a5, a2
 	 	  			esp8266_state=5;
@@ -19077,12 +19070,12 @@ void ICACHE_FLASH_ATTR state_check(void){
 	 }
 	  //∞¥º¸”√”⁄≈‰÷√wifi-smartconfig≈‰÷√◊¥Ã¨
 	  if(!GPIO_INPUT_GET(GPIO_ID_PIN(0)))
-402446b2:	ffc801        	l32r	a0, 402445d4 <udpdata_connect+0x6c>
+402446b2:	ffc801        	l32r	a0, 402445d4 <udpdata_connect+0x70>
 402446b5:	0000c0        	callx0	a0
 402446b8:	04d020        	extui	a13, a2, 0, 1
 402446bb:	5d9c      	beqz.n	a13, 402446d4 <state_check+0xfc>
 402446bd:	000c22        	l8ui	a2, a12, 0
-402446c0:	ff1ce1        	l32r	a14, 40244330 <esp8266_reconn_dns_cb+0x2c>
+402446c0:	ff1be1        	l32r	a14, 4024432c <esp8266_reconn_dns_cb+0x2c>
 402446c3:	fec222        	addi	a2, a2, -2
 		  config_time = configtime;
 
@@ -19105,7 +19098,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 		  esp8266_state = 2;
 402446d8:	e102a0        	excw
 		  config_state = NO_CONFIG;
-402446db:	22ff15        	excw
+402446db:	22ff14        	excw
 	  {
 #ifdef DEBUG_MODE
 	 	  		uart0_tx_buffer("key_config=start\n", 17);
@@ -19115,7 +19108,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 402446de:	004c      	movi.n	a0, 64
 		  config_state = NO_CONFIG;
 		  config_time = configtime;
-402446e0:	ff1321        	l32r	a2, 4024432c <esp8266_reconn_dns_cb+0x28>
+402446e0:	ff1221        	l32r	a2, 40244328 <esp8266_reconn_dns_cb+0x28>
 402446e3:	28a032        	movi	a3, 40
 #ifdef DEBUG_MODE
 	 	  		uart0_tx_buffer("key_config=start\n", 17);
@@ -19154,7 +19147,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 4024470e:	f30b01        	l32r	a0, 4024133c <system_relative_time+0x1c>
 40244711:	0000c0        	callx0	a0
 		  		  config_time = configtime;
-40244714:	ff0621        	l32r	a2, 4024432c <esp8266_reconn_dns_cb+0x28>
+40244714:	ff0521        	l32r	a2, 40244328 <esp8266_reconn_dns_cb+0x28>
 40244717:	832c      	movi.n	a3, 40
 40244719:	004232        	s8i	a3, a2, 0
 		  		  config_state=IN_CONFIG;
@@ -19162,7 +19155,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 4024471e:	004e22        	s8i	a2, a14, 0
 		  		  break;
 40244721:	000cc6        	j	40244758 <state_check+0x180>
-40244724:	012100        	slli	a2, a1, 32
+40244724:	002100        	excw
 		  	  case IN_CONFIG://’˝‘⁄≈‰÷√,80S≈‰÷√ ±º‰
 		  		  config_time=config_time-1;
 40244727:	ff          	.byte 0xff
@@ -19235,7 +19228,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 			  //60s ±º‰µΩ¡À
 			  timer_cnt=0;
 			  if(log_server==1){
-4024476e:	fe3031        	l32r	a3, 40244030 <esp8266_socket_send+0x34>
+4024476e:	fe2f31        	l32r	a3, 4024402c <esp8266_socket_send+0x34>
 	  }
 
 	  timer_cnt = timer_cnt+1;
@@ -19765,7 +19758,7 @@ uart_recvTask(os_event_t *events)
         esp8266_socket_send(data_buff,seril_len);
 40244a05:	0d2d      	mov.n	a2, a13
 40244a07:	743030        	extui	a3, a3, 0, 8
-40244a0a:	ff5f05        	call0	40243ffc <esp8266_socket_send>
+40244a0a:	ff5ec5        	call0	40243ff8 <esp8266_socket_send>
         WRITE_PERI_REG(UART_INT_CLR(UART0), UART_RXFIFO_FULL_INT_CLR|UART_RXFIFO_TOUT_INT_CLR);
 40244a0d:	ff6e21        	l32r	a2, 402447c8 <state_check+0x1f0>
 }
@@ -19863,10 +19856,10 @@ void uart_rx_intr_enable(uint8 uart_no)
 40244a6c:	11d8      	l32i.n	a13, a1, 4
 40244a6e:	10c112        	addi	a1, a1, 16
 40244a71:	f00d      	ret.n
-40244a73:	843400        	extui	a3, a0, 4, 9
+40244a73:	843000        	extui	a3, a0, 0, 9
 40244a76:	fe          	.byte 0xfe
 40244a77:	3f          	.byte 0x3f
-40244a78:	fe8444        	excw
+40244a78:	fe8440        	excw
 40244a7b:	3f          	.byte 0x3f
 
 40244a7c <clr_tcp_block>:
@@ -32833,7 +32826,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 4024c543:	0020c0        	memw
 4024c546:	fffb61        	l32r	a6, 4024c534 <pm_rtc2usec+0x8>
 4024c549:	416542        	s32i	a4, a5, 0x104
-4024c54c:	df5531        	l32r	a3, 402442a0 <tcp_delete_conn+0x24>
+4024c54c:	df5431        	l32r	a3, 4024429c <tcp_delete_conn+0x24>
 4024c54f:	150c      	movi.n	a5, 1
 4024c551:	013327        	bltu	a3, a2, 4024c556 <pm_set_sleep_cycles+0x1e>
 4024c554:	050c      	movi.n	a5, 0
@@ -34835,8 +34828,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 4024d944:	f00d      	ret.n
 4024d946:	f00000        	subx8	a0, a0, a0
 4024d949:	3ffe83        	excw
-4024d94c:	8458      	l32i.n	a5, a4, 32
-4024d94e:	fe          	.byte 0xfe
+4024d94c:	fe8454        	excw
 4024d94f:	3f          	.byte 0x3f
 4024d950:	26e700        	excw
 4024d953:	c11240        	mul16u	a1, a2, a4
@@ -37552,7 +37544,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 4024f493:	83f000        	moveqz	a15, a0, a0
 4024f496:	fe          	.byte 0xfe
 4024f497:	3f          	.byte 0x3f
-4024f498:	845c      	movi.n	a4, 88
+4024f498:	8458      	l32i.n	a5, a4, 32
 4024f49a:	fe          	.byte 0xfe
 4024f49b:	3f          	.byte 0x3f
 4024f49c:	26e950        	excw
@@ -38756,7 +38748,8 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 402500c9:	fff446        	j	4025009e <ppPeocessRxPktHdr+0x29e>
 402500cc:	fe83f0        	excw
 402500cf:	3f          	.byte 0x3f
-402500d0:	fe8460        	excw
+402500d0:	845c      	movi.n	a4, 88
+402500d2:	fe          	.byte 0xfe
 402500d3:	3f          	.byte 0x3f
 402500d4:	26ea30        	excw
 402500d7:	369c40        	excw
@@ -39908,7 +39901,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 40250c46:	124010        	excw
 40250c49:	c2e0c1        	l32r	a12, 402417cc <wifi_station_dhcpc_stop+0x3c>
 40250c4c:	020561        	l32r	a6, 40211460 <_lit4_end+0x10ae98>
-40250c4f:	cd0461        	l32r	a6, 40244060 <process_command+0x2c>
+40250c4f:	cd0461        	l32r	a6, 40244060 <process_command+0x30>
 40250c52:	420802        	l8ui	a0, a8, 66
 40250c55:	3109      	s32i.n	a0, a1, 12
 40250c57:	fff845        	call0	40250bdc <pp_attach+0xf8>
@@ -44389,7 +44382,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 4025395d:	0020c0        	memw
 40253960:	9b6c52        	s32i	a5, a12, 0x26c
 40253963:	000b86        	j	40253995 <hostap_input+0xab9>
-40253966:	c24e31        	l32r	a3, 402442a0 <tcp_delete_conn+0x24>
+40253966:	c24d31        	l32r	a3, 4024429c <tcp_delete_conn+0x24>
 40253969:	040c      	movi.n	a4, 0
 4025396b:	150c      	movi.n	a5, 1
 4025396d:	b29301        	l32r	a0, 402403bc <user_uart_wait_tx_fifo_empty+0x148>
@@ -44416,7 +44409,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 402539a6:	051026        	beqi	a0, 1, 402539af <hostap_input+0xad3>
 402539a9:	fbc032        	addi	a3, a0, -5
 402539ac:	ebc356        	bnez	a3, 4025386c <hostap_input+0x990>
-402539af:	c23c31        	l32r	a3, 402442a0 <tcp_delete_conn+0x24>
+402539af:	c23b31        	l32r	a3, 4024429c <tcp_delete_conn+0x24>
 402539b2:	040c      	movi.n	a4, 0
 402539b4:	150c      	movi.n	a5, 1
 402539b6:	b28101        	l32r	a0, 402403bc <user_uart_wait_tx_fifo_empty+0x148>
@@ -61215,7 +61208,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 4025dd8a:	ec0000        	excw
 4025dd8d:	25dc      	bnez.n	a5, 4025dda3 <espconn_tcp_write+0x17b>
 4025dd8f:	f10040        	excw
-4025dd92:	304026        	beqi	a0, 4, 4025ddc6 <espconn_tcp_write+0x19e>
+4025dd92:	2c4026        	beqi	a0, 4, 4025ddc2 <espconn_tcp_write+0x19a>
 4025dd95:	3ffe84        	excw
 4025dd98:	f0c112        	addi	a1, a1, -16
 4025dd9b:	0109      	s32i.n	a0, a1, 0
@@ -70023,8 +70016,8 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 40263376:	6102f0        	excw
 40263379:	3f4500        	excw
 4026337c:	21fb      	addi.n	a2, a1, 15
-4026337e:	83c8      	l32i.n	a12, a3, 32
-40263380:	fffc31        	l32r	a3, 40263370 <tcp_timer_needed+0x54>
+4026337e:	3183c7        	bany	a3, a12, 402633b3 <sys_timeouts_init+0xf>
+40263381:	fffc      	bnez.n	a15, 402633c4 <sys_timeouts_init+0x20>
 40263383:	00a042        	movi	a4, 0
 40263386:	000785        	call0	40263400 <sys_timeout>
 40263389:	002102        	l32i	a0, a1, 0
@@ -70039,7 +70032,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 402633a2:	214010        	srai	a4, a1, 0
 
 402633a4 <sys_timeouts_init>:
-402633a4:	83bf21        	l32r	a2, 402442a0 <tcp_delete_conn+0x24>
+402633a4:	83be21        	l32r	a2, 4024429c <tcp_delete_conn+0x24>
 402633a7:	fff231        	l32r	a3, 40263370 <tcp_timer_needed+0x54>
 402633aa:	040c      	movi.n	a4, 0
 402633ac:	f0c112        	addi	a1, a1, -16
@@ -70181,7 +70174,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 402634e5:	1d08      	l32i.n	a0, a13, 4
 402634e7:	2fdc      	bnez.n	a15, 402634fd <sys_check_timeouts+0x3d>
 402634e9:	723e07        	bltu	a14, a0, 4026355f <sys_check_timeouts+0x9f>
-402634ec:	836d31        	l32r	a3, 402442a0 <tcp_delete_conn+0x24>
+402634ec:	836c31        	l32r	a3, 4024429c <tcp_delete_conn+0x24>
 402634ef:	c02e00        	sub	a2, a14, a0
 402634f2:	72f801        	l32r	a0, 402400d4 <_irom0_text_start+0xd4>
 402634f5:	0000c0        	callx0	a0
@@ -70227,7 +70220,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 40263558:	1108      	l32i.n	a0, a1, 4
 4026355a:	20c112        	addi	a1, a1, 32
 4026355d:	f00d      	ret.n
-4026355f:	835031        	l32r	a3, 402442a0 <tcp_delete_conn+0x24>
+4026355f:	834f31        	l32r	a3, 4024429c <tcp_delete_conn+0x24>
 40263562:	302020        	xor	a2, a0, a2
 40263565:	2e2a      	add.n	a2, a14, a2
 40263567:	221b      	addi.n	a2, a2, 1
@@ -79227,7 +79220,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 40268d6f:	3f          	.byte 0x3f
 40268d70:	26f630        	excw
 40268d73:	f65040        	excw
-40268d76:	684026        	beqi	a0, 4, 40268de2 <sc_free_snif_glob+0x16>
+40268d76:	644026        	beqi	a0, 4, 40268dde <sc_free_snif_glob+0x12>
 40268d79:	3ffe84        	excw
 
 40268d7c <sc_init_snif_glob>:
@@ -80015,7 +80008,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 4026952b:	3f          	.byte 0x3f
 4026952c:	26f850        	excw
 4026952f:	f87040        	excw
-40269532:	784026        	beqi	a0, 4, 402695ae <KISS_Free_guide_glob+0x2a>
+40269532:	744026        	beqi	a0, 4, 402695aa <KISS_Free_guide_glob+0x26>
 40269535:	3ffe84        	excw
 
 40269538 <KISS_Init_guide_glob>:
@@ -83687,7 +83680,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 4026bb9f:	ff8000        	excw
 4026bba2:	a04026        	beqi	a0, 4, 4026bb46 <KISS_Deal_with+0x1fa>
 4026bba5:	ff          	.byte 0xff
-4026bba6:	884026        	beqi	a0, 4, 4026bb32 <KISS_Deal_with+0x1e6>
+4026bba6:	844026        	beqi	a0, 4, 4026bb2e <KISS_Deal_with+0x1e2>
 4026bba9:	3ffe84        	excw
 4026bbac:	26ffd0        	excw
 4026bbaf:	fff040        	excw
@@ -88282,7 +88275,7 @@ uart_init_2(UartBautRate uart0_br, UartBautRate uart1_br)
 4026fa20:	0d0a      	add.n	a0, a13, a0
 4026fa22:	505954        	excw
 4026fa25:	203a45        	call0	4028fdcc <_irom0_text_end+0x1f81c>
-4026fa28:	524941        	l32r	a4, 4024434c <smartconfig_done+0x18>
+4026fa28:	524941        	l32r	a4, 4024434c <smartconfig_done+0x1c>
 4026fa2b:	494b      	addi.n	a4, a9, 4
 4026fa2d:	0a5353        	excw
 4026fa30:	000d      	mov.n	a0, a0

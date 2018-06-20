@@ -83,6 +83,10 @@ void ICACHE_FLASH_ATTR to_scan(void) {
 	os_timer_setfn(&tcp_conn_timer, (os_timer_func_t *)tcp_start_conn, NULL);
 	os_timer_arm(&tcp_conn_timer, 10000, 0);
 
+#ifdef  UDP_ENABLE
+	udpdata_connect();
+#endif
+
 	//定时维持TCP连接，超时后重新连接
 	//os_timer_disarm(&app_data_connect_timer);
 	//os_timer_setfn(&app_data_connect_timer, (os_timer_func_t *)tcp_re_start_conn, NULL);
@@ -92,11 +96,11 @@ void ICACHE_FLASH_ATTR to_scan(void) {
 void ICACHE_FLASH_ATTR
 gpio_init(void){
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);//设置为复位的按键  主要用于重新配置wifi
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);  //第一个灯
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);  //第二个灯
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO5_U, FUNC_GPIO5);  //第四个灯
-	//PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO4_U, FUNC_GPIO4);  //第三个灯
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //第五个灯
+#ifdef UDP_ENABLE
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO12);  //控制继电器IO
+	GPIO_OUTPUT_SET(GPIO_ID_PIN(12), 0);
+#endif
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);  //输出wifi的状态
 	GPIO_OUTPUT_SET(GPIO_ID_PIN(14), 1);//WIFI模块未配置
 }
 void user_init(void)

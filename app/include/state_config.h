@@ -13,6 +13,8 @@ extern void tcp_start_conn(void);
 
 extern void tcp_re_start_conn(void);
 
+extern void udpdata_connect(void);
+
 extern uint8 wifi_rssi;
 
 uint8 set_server_ip[6];

@@ -44,84 +44,12 @@ int8_t portconfig_cnt=0;
 struct espconn phone_udp_conn;
 esp_udp phone_udp;
 void ICACHE_FLASH_ATTR udp_process_command(char *pdata, unsigned short len);
+void ICACHE_FLASH_ATTR smartconfig_done(sc_status status, void *pdata);
+
 
 int udp_Current_Remote_Port;//UDP连接的远程端口
 uint8_t udp_Current_Remote_Ip[4] = {0};  //用来存放现在连接过来的远端IP
 
-void ICACHE_FLASH_ATTR
-udp_process_command(char *pdata, unsigned short len){
-		char data_buf[64];
-		int i;
-		uint8_t ret=0;
-		uint8_t index = 0;
-		uint32 ret_port=0;
-		os_memcpy(data_buf,pdata,len);
-		if(!strncmp(data_buf,"SERVER IP:",strlen("SERVER IP:"))){
-			ipconfig_cnt=1;
-			for(i = 0; data_buf[i+10] != ':' && i < 15; i++){
-				if(data_buf[i+10] != '.'){
-				ret = ret*10 + data_buf[i+10] - '0';
-				set_server_ip[index] = ret;
-				}else{
-					ret = 0;
-					index++;
-					}
-				}
-			memset(data_buf,0,sizeof(data_buf));
-
-		}else if(!strncmp(data_buf,"SERVER PORT:",strlen("SERVER PORT:"))){
-			portconfig_cnt=1;
-			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
-				{
-				ret_port = ret_port*10 + data_buf[i+12] - '0';
-				}
-
-			current_set_Port=ret_port;
-			set_server_ip[4] = current_set_Port/256;
-			set_server_ip[5] = current_set_Port%256;
-			memset(data_buf,0,sizeof(data_buf));
-		}
-		if((ipconfig_cnt==1) && (portconfig_cnt==1)){
-			ipconfig_cnt=0;
-			portconfig_cnt=0;
-			spi_flash_erase_sector(0x3C);
-			spi_flash_write(0x3C * 4096, (uint32 *)set_server_ip, 6);
-
-#ifdef DEBUG_MODE
-	uart0_tx_buffer("/r/n", 2);
-	uart0_tx_buffer("/r/n", 2);
-	uart0_tx_buffer("/r/n", 2);
-	uart0_tx_buffer("/r/n", 2);
-	uart0_tx_buffer(set_server_ip, 6);
-#endif
-			system_restart();
-		}
-}
-void ICACHE_FLASH_ATTR
-udpdata_recv(void *arg, char *pdata, unsigned short len){
-	struct espconn *pespconnte = (struct espconn *)arg;
-
-	//获取远程连接的UDP的端口和IP地址,也就是配置手机的端口和IP地址
-	udp_Current_Remote_Port =  pespconnte->proto.udp->remote_port;
-	os_memcpy(udp_Current_Remote_Ip,pespconnte->proto.udp->remote_ip,4);
-
-	udp_process_command(pdata,len);
-}
-
-void ICACHE_FLASH_ATTR
-udpdata_connect(void){
-	uint8 udp_ip_remote[4]={255,255,255,255};
-	phone_udp_conn.type = ESPCONN_UDP;
-	phone_udp_conn.proto.udp = &phone_udp;
-	phone_udp_conn.proto.udp->local_port = 2002;//本地端口
-	phone_udp_conn.proto.udp->remote_port = 2002;//远程端口
-
-	//os_memcpy(phone_udp_conn.proto.udp->local_ip,udp_ip_local,4);
-	os_memcpy(phone_udp_conn.proto.udp->remote_ip,udp_ip_remote,4);
-	//用于接收端口IP地址配置信息
-	espconn_regist_recvcb(&phone_udp_conn, udpdata_recv); // 注册一个UDP数据包接收回调
-	espconn_create(&phone_udp_conn);//建立 UDP 传输
-}
 void ICACHE_FLASH_ATTR
 smartconfig_done(sc_status status, void *pdata){
     switch(status) {
@@ -179,6 +107,95 @@ smartconfig_done(sc_status status, void *pdata){
     }
 }
 
+
+void ICACHE_FLASH_ATTR
+udp_process_command(char *pdata, unsigned short len){
+		char data_buf[64];
+		int i;
+		uint8_t ret=0;
+		uint8_t index = 0;
+		uint32 ret_port=0;
+		os_memcpy(data_buf,pdata,len);
+		if(!strncmp(data_buf,"SERVER IP:",strlen("SERVER IP:"))){
+			ipconfig_cnt=1;
+			for(i = 0; data_buf[i+10] != ':' && i < 15; i++){
+				if(data_buf[i+10] != '.'){
+				ret = ret*10 + data_buf[i+10] - '0';
+				set_server_ip[index] = ret;
+				}else{
+					ret = 0;
+					index++;
+					}
+				}
+			memset(data_buf,0,sizeof(data_buf));
+
+		}else if(!strncmp(data_buf,"SERVER PORT:",strlen("SERVER PORT:"))){
+			portconfig_cnt=1;
+			for(i = 0; data_buf[i+12] != ':' && i < 5; i++)
+				{
+				ret_port = ret_port*10 + data_buf[i+12] - '0';
+				}
+
+			current_set_Port=ret_port;
+			set_server_ip[4] = current_set_Port/256;
+			set_server_ip[5] = current_set_Port%256;
+			memset(data_buf,0,sizeof(data_buf));
+		}
+		if((ipconfig_cnt==1) && (portconfig_cnt==1)){
+			ipconfig_cnt=0;
+			portconfig_cnt=0;
+			spi_flash_erase_sector(0x3C);
+			spi_flash_write(0x3C * 4096, (uint32 *)set_server_ip, 6);
+
+#ifdef DEBUG_MODE
+	uart0_tx_buffer("/r/n", 2);
+	uart0_tx_buffer("/r/n", 2);
+	uart0_tx_buffer("/r/n", 2);
+	uart0_tx_buffer("/r/n", 2);
+	uart0_tx_buffer(set_server_ip, 6);
+#endif
+			system_restart();
+		}
+#ifdef UDP_ENABLE
+		if(!strncmp(data_buf,"smartconfig",strlen("smartconfig"))){
+		//开启配置模式
+		 	  smartconfig_stop();//停止配置,为了以后用户突然的中断
+			  esp8266_state = 2;
+			  config_state = NO_CONFIG;
+			  config_time = configtime;
+		}
+		memset(data_buf,0,sizeof(data_buf));
+#endif
+}
+void ICACHE_FLASH_ATTR
+udpdata_recv(void *arg, char *pdata, unsigned short len){
+	struct espconn *pespconnte = (struct espconn *)arg;
+
+	//获取远程连接的UDP的端口和IP地址,也就是配置手机的端口和IP地址
+	udp_Current_Remote_Port =  pespconnte->proto.udp->remote_port;
+	os_memcpy(udp_Current_Remote_Ip,pespconnte->proto.udp->remote_ip,4);
+
+	udp_process_command(pdata,len);
+}
+
+void ICACHE_FLASH_ATTR
+udpdata_connect(void){
+	uint8 udp_ip_remote[4]={255,255,255,255};
+	wifi_set_broadcast_if(0x01);//设置udp广播从station 发出
+	phone_udp_conn.type = ESPCONN_UDP;
+	phone_udp_conn.proto.udp = &phone_udp;
+	phone_udp_conn.proto.udp->local_port = 2002;//本地端口
+	phone_udp_conn.proto.udp->remote_port = 2002;//远程端口
+
+	//os_memcpy(phone_udp_conn.proto.udp->local_ip,udp_ip_local,4);
+	os_memcpy(phone_udp_conn.proto.udp->remote_ip,udp_ip_remote,4);
+	//用于接收端口IP地址配置信息
+	espconn_regist_recvcb(&phone_udp_conn, udpdata_recv); // 注册一个UDP数据包接收回调
+	//espconn_regist_sentcb(&phone_udp_conn, udpdata_send);//发送回调函数
+	espconn_create(&phone_udp_conn);//建立 UDP 传输
+}
+
+
 void ICACHE_FLASH_ATTR state_check(void){
 	  uint8_t wifi_conn_state;
 
@@ -235,7 +252,7 @@ void ICACHE_FLASH_ATTR state_check(void){
 	 	  		  if(esp8266_state!=5){
 	 				#ifdef DNS_ENABLE
 	 				#else
-	 		  			udpdata_connect();
+	 		  			//udpdata_connect();
 	 				#endif
 	 	  			esp8266_state=5;
 	 	  		  }

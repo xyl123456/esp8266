@@ -22,6 +22,7 @@ void espconn_init_sent(struct espconn *espconn);
 
 #define DNS_ENABLE  1
 
+//#define UDP_ENABLE  1
 //#define DEBUG_MODE  1
 
 typedef union tcp_init
