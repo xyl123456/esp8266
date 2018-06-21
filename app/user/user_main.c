@@ -68,6 +68,8 @@ void ICACHE_FLASH_ATTR tcp_start_conn(void){
 		os_timer_setfn(&tcp_conn_timer, (os_timer_func_t *)tcp_start_conn, NULL);
 		os_timer_arm(&tcp_conn_timer, 10000, 0);
 	}
+
+	uart0_tx_buffer("\r\n", 2);
 }
 
 

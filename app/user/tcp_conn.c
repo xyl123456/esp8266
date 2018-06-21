@@ -27,12 +27,12 @@
 
 //美丽妈妈  1883
 
-//#define NET_DOMAIN "ibms.env365.cn"
+#define NET_DOMAIN "ibms.env365.cn"
 //#define NET_DOMAIN "api.env365.cn"
-#define NET_DOMAIN "xylvip.top"
+//#define NET_DOMAIN "xylvip.top"
 //#define NET_DOMAIN "pub.env365.cn"
 //#define NET_DOMAIN "1498kn1392.imwork.net"
-#define DNS_PORT   1883
+#define DNS_PORT   6000
 
 uint8 log_server=0;
 
@@ -241,6 +241,7 @@ esp8266_tcp_connect_cb(void *arg){
     espconn_regist_recvcb(pespconn, esp8266_tcp_recv_cb);
     espconn_regist_sentcb(pespconn, esp8266_tcp_sent_cb);
     espconn_regist_disconcb(pespconn, esp8266_tcp_discon_cb);
+
 
     uart0_tx_buffer(send_registdata, 13); //发送注册信息
 
